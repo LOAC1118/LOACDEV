@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moulin des Moines — Bon de Commande Promotion Mars / Avril 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --terra:    #C87864;
+  --terra-d:  #A05848;
+  --terra-l:  #F5DDD6;
+  --brown:    #5C3D2E;
+  --brown-m:  #7A5244;
+  --cream:    #FBF6F0;
+  --cream-d:  #EFE3D8;
+  --gold:     #C9A84C;
+  --gold-l:   #F7EDCC;
+  --green:    #2D6A4F;
+  --green-l:  #E8F5EE;
+  --text:     #1E0E06;
+  --muted:    #8C6B5A;
+  --white:    #FFFFFF;
+  --r: 12px;
+  --active-remise: 0;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+
+/* ══ HEADER ═════════════════════════════════════════════════ */
+header{background:var(--brown);position:relative;overflow:hidden;}
+header::after{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  pointer-events:none;
+}
+.header-wrap{max-width:960px;margin:0 auto;padding:36px 24px 28px;position:relative;z-index:1;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo-title{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--white);letter-spacing:-.01em;line-height:1.1;}
+.logo-sub{font-size:.72rem;font-weight:300;color:rgba(255,255,255,.55);letter-spacing:.15em;text-transform:uppercase;margin-top:5px;}
+.promo-badge{
+  background:var(--terra);border-radius:60px;padding:10px 22px;
+  display:flex;align-items:center;gap:10px;
+  box-shadow:0 6px 24px rgba(0,0,0,.25);flex-shrink:0;
+}
+.promo-badge .pct{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--gold-l);line-height:1;}
+.promo-badge .ptext{font-size:.78rem;color:rgba(255,255,255,.85);line-height:1.3;}
+.gold-strip{height:3px;background:linear-gradient(90deg,var(--terra) 0%,var(--gold) 40%,var(--terra-l) 70%,var(--gold) 100%);}
+
+/* ══ INFOS BAR ══════════════════════════════════════════════ */
+.infobar{
+  background:var(--green-l);border-bottom:2px solid var(--green);
+  padding:9px 24px;display:flex;align-items:center;justify-content:center;
+  gap:28px;flex-wrap:wrap;font-size:.78rem;font-weight:500;color:var(--green);
+}
+.infobar span{display:flex;align-items:center;gap:5px;}
+
+/* ══ PALIERS ════════════════════════════════════════════════ */
+.paliers-wrap{
+  max-width:960px;margin:0 auto;padding:20px 24px 0;
+}
+.paliers-title{
+  font-family:'Playfair Display',serif;
+  font-size:1rem;font-weight:500;color:var(--brown);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.paliers-title::before{content:'';width:4px;height:18px;background:var(--gold);border-radius:3px;flex-shrink:0;}
+
+.paliers-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  margin-bottom:4px;
+}
+.palier{
+  border-radius:10px;padding:14px 12px;
+  border:2px solid transparent;
+  position:relative;overflow:hidden;
+  transition:all .3s ease;
+  cursor:default;
+}
+.palier::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,.08) 0%, transparent 60%);
+  pointer-events:none;
+}
+
+/* Palier 0 – aucune remise */
+.palier-0{background:var(--cream-d);border-color:var(--cream-d);}
+.palier-0 .p-label{color:var(--muted);}
+.palier-0 .p-pct{color:var(--muted);}
+.palier-0 .p-seuil{color:var(--muted);}
+
+/* Palier 1 – 7% */
+.palier-1{background:#fff9f0;border-color:#e8c97a;}
+.palier-1 .p-label{color:#8a6800;}
+.palier-1 .p-pct{color:#c9a84c;}
+.palier-1 .p-seuil{color:#a07800;}
+
+/* Palier 2 – 10% */
+.palier-2{background:#f0f8ff;border-color:#7ab8e8;}
+.palier-2 .p-label{color:#005a8a;}
+.palier-2 .p-pct{color:#2980b9;}
+.palier-2 .p-seuil{color:#0069a0;}
+
+/* Palier 3 – 12% */
+.palier-3{background:var(--green-l);border-color:var(--green);}
+.palier-3 .p-label{color:var(--green);}
+.palier-3 .p-pct{color:var(--green);}
+.palier-3 .p-seuil{color:var(--green);}
+
+/* Actif */
+.palier.active{
+  transform:translateY(-3px);
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
+}
+.palier-0.active{border-color:var(--muted);}
+.palier-1.active{border-color:var(--gold);box-shadow:0 8px 24px rgba(201,168,76,.25);}
+.palier-2.active{border-color:#2980b9;box-shadow:0 8px 24px rgba(41,128,185,.2);}
+.palier-3.active{border-color:var(--green);box-shadow:0 8px 24px rgba(45,106,79,.25);}
+
+.palier-badge{
+  position:absolute;top:8px;right:8px;
+  font-size:.58rem;font-weight:700;
+  padding:2px 7px;border-radius:20px;
+  text-transform:uppercase;letter-spacing:.07em;
+  opacity:0;transition:opacity .3s;
+}
+.palier.active .palier-badge{opacity:1;}
+.palier-1 .palier-badge{background:#c9a84c;color:#fff;}
+.palier-2 .palier-badge{background:#2980b9;color:#fff;}
+.palier-3 .palier-badge{background:var(--green);color:#fff;}
+.palier-0 .palier-badge{background:var(--muted);color:#fff;}
+
+.p-icon{font-size:1.4rem;margin-bottom:6px;}
+.p-pct{
+  font-family:'Playfair Display',serif;
+  font-size:1.6rem;font-weight:700;line-height:1;margin-bottom:3px;
+  transition:color .3s;
+}
+.p-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;transition:color .3s;}
+.p-seuil{font-size:.72rem;font-weight:500;transition:color .3s;}
+
+/* Barre de progression */
+.progress-bar-wrap{
+  background:var(--cream-d);border-radius:20px;height:8px;
+  margin:10px 0 4px;overflow:hidden;
+}
+.progress-bar-inner{
+  height:100%;border-radius:20px;
+  background:linear-gradient(90deg,var(--gold),var(--green));
+  transition:width .5s cubic-bezier(.34,1.56,.64,1);
+  width:0%;
+}
+.progress-label{
+  font-size:.68rem;color:var(--muted);text-align:right;
+  transition:all .3s;
+}
+
+/* ══ STICKY BAR ═════════════════════════════════════════════ */
+.sticky{
+  position:sticky;top:0;z-index:200;
+  background:var(--brown);padding:10px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  box-shadow:0 4px 20px rgba(0,0,0,.22);
+  border-radius:0 0 14px 14px;
+}
+.sticky-totals{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.s-item{display:flex;flex-direction:column;gap:1px;}
+.s-lbl{font-size:.63rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;}
+.s-val{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--gold-l);}
+.s-val.warn{color:#F4A261;}
+.s-val.ok{color:#6FCF97;}
+.s-sep{width:1px;height:32px;background:rgba(255,255,255,.15);}
+.remise-pill{
+  font-size:.78rem;font-weight:700;
+  padding:6px 16px;border-radius:20px;
+  background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);
+  border:1px solid rgba(255,255,255,.15);
+  transition:all .4s;display:flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.remise-pill.p1{background:rgba(201,168,76,.2);color:var(--gold-l);border-color:rgba(201,168,76,.4);}
+.remise-pill.p2{background:rgba(41,128,185,.25);color:#7ec8f5;border-color:rgba(41,128,185,.4);}
+.remise-pill.p3{background:rgba(45,106,79,.3);color:#6FCF97;border-color:rgba(45,106,79,.5);}
+
+/* ══ MAIN ════════════════════════════════════════════════════ */
+main{max-width:960px;margin:0 auto;padding:20px 24px 80px;}
+.stitle{
+  font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:500;
+  color:var(--brown);margin-bottom:14px;padding-bottom:10px;
+  border-bottom:2px solid var(--terra-l);
+  display:flex;align-items:center;gap:10px;
+}
+.stitle::before{content:'';width:4px;height:22px;background:var(--terra);border-radius:3px;flex-shrink:0;}
+
+/* ══ GAMME CARD ═════════════════════════════════════════════ */
+.gamme{
+  background:var(--white);border-radius:var(--r);overflow:hidden;
+  margin-bottom:18px;box-shadow:0 2px 16px rgba(92,61,46,.08);
+  border:1px solid var(--cream-d);animation:up .5s ease both;
+}
+.gamme:nth-child(1){animation-delay:.05s}
+.gamme:nth-child(2){animation-delay:.1s}
+.gamme:nth-child(3){animation-delay:.15s}
+@keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.gamme-hdr{
+  background:var(--brown-m);padding:11px 18px;
+  font-weight:600;font-size:.85rem;color:var(--white);
+  letter-spacing:.03em;display:flex;align-items:center;gap:8px;
+}
+.gamme-hdr .nb{
+  margin-left:auto;font-size:.7rem;
+  background:rgba(255,255,255,.15);padding:2px 9px;border-radius:20px;
+  font-weight:400;
+}
+
+/* ══ TABLE ══════════════════════════════════════════════════ */
+.thead{
+  display:grid;grid-template-columns:70px 1fr 60px 88px 88px 90px 100px;
+  padding:7px 16px;background:var(--cream);border-bottom:1px solid var(--cream-d);
+  font-size:.67rem;font-weight:600;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.07em;gap:6px;
+}
+.tc{text-align:center;}.tr{text-align:right;}
+
+.prow{
+  display:grid;grid-template-columns:70px 1fr 60px 88px 88px 90px 100px;
+  align-items:center;padding:9px 16px;gap:6px;
+  border-bottom:1px solid var(--cream-d);transition:background .15s;
+}
+.prow:last-child{border-bottom:none;}
+.prow:hover{background:#FEFAF5;}
+.prow:nth-child(even){background:#FAFAF6;}
+.prow:nth-child(even):hover{background:#FEFAF5;}
+
+.p-code{font-size:.7rem;color:var(--muted);font-weight:500;font-family:monospace;}
+.p-name{font-size:.84rem;font-weight:500;color:var(--text);line-height:1.3;}
+.p-pcb{font-size:.78rem;color:var(--muted);text-align:center;}
+.p-ht{font-size:.8rem;color:var(--muted);text-align:right;text-decoration:line-through;text-decoration-color:var(--terra-l);}
+.p-promo{font-size:.88rem;font-weight:700;color:var(--green);text-align:right;transition:color .3s;}
+.p-total{font-size:.84rem;font-weight:700;color:var(--brown);text-align:right;min-height:18px;}
+
+/* ══ SAISIE COLIS ════════════════════════════════════════════ */
+.qwrap{
+  display:flex;align-items:center;border:2px solid var(--gold);
+  border-radius:8px;overflow:hidden;background:var(--white);
+  box-shadow:0 1px 6px rgba(201,168,76,.15);
+}
+.qbtn{
+  width:26px;height:32px;background:var(--gold-l);border:none;cursor:pointer;
+  font-size:1rem;font-weight:700;color:var(--brown);
+  display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;
+}
+.qbtn:hover{background:var(--gold);}
+.qinp{
+  width:100%;height:32px;border:none;text-align:center;
+  font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:700;
+  color:var(--brown);background:transparent;outline:none;min-width:0;
+}
+.qinp::-webkit-inner-spin-button,.qinp::-webkit-outer-spin-button{-webkit-appearance:none;}
+.qinp[type=number]{-moz-appearance:textfield;}
+
+/* ══ RÉCAP ═══════════════════════════════════════════════════ */
+.recap-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+.rc{
+  background:var(--brown);border-radius:var(--r);padding:16px 18px;text-align:center;
+  box-shadow:0 4px 16px rgba(92,61,46,.15);
+}
+.rc-lbl{font-size:.67rem;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.rc-val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold-l);line-height:1;}
+.rc-val.sm{font-size:1.2rem;}
+.rc-val.warn{color:#F4A261;}
+.rc-val.ok{color:#6FCF97;}
+.rc-sub{font-size:.65rem;color:rgba(255,255,255,.35);margin-top:3px;}
+.rc.ht{background:var(--terra);}
+.rc.ttc{background:var(--brown-m);}
+
+/* ══ FORMULAIRE ═════════════════════════════════════════════ */
+.fcard{
+  background:var(--white);border-radius:var(--r);padding:26px;
+  border:1px solid var(--cream-d);box-shadow:0 2px 16px rgba(92,61,46,.08);margin-bottom:22px;
+}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px;}
+.field label{
+  display:block;font-size:.68rem;font-weight:600;color:var(--brown-m);
+  text-transform:uppercase;letter-spacing:.09em;margin-bottom:5px;
+}
+.field input{
+  width:100%;padding:10px 13px;border:1.5px solid var(--cream-d);border-radius:8px;
+  font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text);
+  background:var(--cream);outline:none;transition:border-color .2s,box-shadow .2s,background .2s;
+}
+.field input:focus{border-color:var(--terra);box-shadow:0 0 0 3px rgba(200,120,100,.13);background:var(--white);}
+.req{color:var(--terra);}
+
+/* ══ BOUTONS ════════════════════════════════════════════════ */
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+.btn{
+  padding:15px 20px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;
+  font-size:.92rem;font-weight:600;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:9px;transition:all .2s;letter-spacing:.01em;
+}
+.btn-pdf{background:var(--brown);color:var(--white);box-shadow:0 4px 14px rgba(92,61,46,.28);}
+.btn-pdf:hover{background:var(--brown-m);transform:translateY(-1px);}
+.btn-mail{background:var(--terra);color:var(--white);box-shadow:0 4px 14px rgba(200,120,100,.32);}
+.btn-mail:hover{background:var(--terra-d);transform:translateY(-1px);}
+.btn:active{transform:translateY(0)!important;}
+.btn:disabled{opacity:.6;cursor:not-allowed;transform:none!important;}
+
+/* ══ SUCCESS ════════════════════════════════════════════════ */
+#success{
+  display:none;background:var(--green-l);border:2px solid var(--green);
+  border-radius:var(--r);padding:24px 28px;text-align:center;animation:up .4s ease;
+}
+#success h3{font-family:'Playfair Display',serif;font-size:1.4rem;color:var(--green);margin-bottom:8px;}
+#success p{font-size:.88rem;color:var(--green);}
+#recap-txt{
+  margin-top:16px;text-align:left;background:var(--white);border-radius:8px;padding:14px;
+  font-size:.73rem;color:var(--text);white-space:pre-wrap;font-family:'Courier New',monospace;
+  border:1px solid var(--cream-d);max-height:260px;overflow-y:auto;
+}
+
+footer{
+  text-align:center;padding:14px 24px;font-size:.76rem;color:var(--muted);
+  border-top:1px solid var(--cream-d);background:var(--white);
+}
+
+/* ══ RESPONSIVE ═════════════════════════════════════════════ */
+@media(max-width:700px){
+  .paliers-grid{grid-template-columns:1fr 1fr;}
+  .thead{display:none;}
+  .prow{grid-template-columns:1fr auto;grid-template-rows:auto auto auto;}
+  .p-code,.p-pcb,.p-ht{display:none;}
+  .recap-grid{grid-template-columns:1fr 1fr;}
+  .btn-row{grid-template-columns:1fr;}
+  .fgrid{grid-template-columns:1fr;}
+  .header-top{flex-direction:column;}
+  .logo-title{font-size:1.6rem;}
+}
+@media print{
+  .sticky,.btn-row,#success,.paliers-wrap{display:none!important;}
+  body{background:#fff;}main{padding:0;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════ -->
+<header>
+  <div class="header-wrap">
+    <div class="header-top">
+      <div class="logo-block">
+        <div class="logo-title">🌾 Moulin des Moines</div>
+        <div class="logo-sub">Créateur &amp; Producteur Bio · Alsace depuis 1972</div>
+      </div>
+      <div class="promo-badge" id="header-badge">
+        <div class="pct" id="badge-pct">−7%</div>
+        <div class="ptext">sur toute la gamme<br>Biscuits Sucrés Bio</div>
+      </div>
+    </div>
+  </div>
+  <div class="gold-strip"></div>
+</header>
+
+<div class="infobar">
+  <span>📅 1er mars – 30 avril 2026</span>
+  <span>📦 Minimum 10 colis</span>
+  <span>🌿 Certifiés Agriculture Biologique AB</span>
+  <span>🏭 Fabriqués en Alsace</span>
+</div>
+
+<!-- ══ PALIERS DE REMISE ════════════════════════════════════ -->
+<div class="paliers-wrap">
+  <div class="paliers-title">🎯 Paliers de remise — plus vous commandez, plus vous économisez</div>
+  <div class="paliers-grid">
+
+    <div class="palier palier-0" id="pal-0">
+      <div class="palier-badge">En cours</div>
+      <div class="p-icon">🛒</div>
+      <div class="p-pct">0%</div>
+      <div class="p-label">Aucune remise</div>
+      <div class="p-seuil">Moins de 10 colis</div>
+    </div>
+
+    <div class="palier palier-1" id="pal-1">
+      <div class="palier-badge">✓ Actif</div>
+      <div class="p-icon">⭐</div>
+      <div class="p-pct">−7%</div>
+      <div class="p-label">Palier Bronze</div>
+      <div class="p-seuil">Dès 10 colis</div>
+    </div>
+
+    <div class="palier palier-2" id="pal-2">
+      <div class="palier-badge">✓ Actif</div>
+      <div class="p-icon">💎</div>
+      <div class="p-pct">−10%</div>
+      <div class="p-label">Palier Argent</div>
+      <div class="p-seuil">Dès 15 colis</div>
+    </div>
+
+    <div class="palier palier-3" id="pal-3">
+      <div class="palier-badge">✓ Actif</div>
+      <div class="p-icon">🏆</div>
+      <div class="p-pct">−12%</div>
+      <div class="p-label">Palier Or</div>
+      <div class="p-seuil">Dès 20 colis</div>
+    </div>
+
+  </div>
+
+  <!-- Barre de progression vers le prochain palier -->
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-inner" id="progress-bar"></div>
+  </div>
+  <div class="progress-label" id="progress-label">Ajoutez 10 colis pour débloquer −7%</div>
+</div>
+
+<!-- ══ STICKY TOTAL ═════════════════════════════════════════ -->
+<div class="sticky">
+  <div class="sticky-totals">
+    <div class="s-item">
+      <div class="s-lbl">Nb Colis</div>
+      <div class="s-val" id="s-colis">0</div>
+    </div>
+    <div class="s-sep"></div>
+    <div class="s-item">
+      <div class="s-lbl">Total HT</div>
+      <div class="s-val" id="s-ht">0,00 €</div>
+    </div>
+    <div class="s-sep"></div>
+    <div class="s-item">
+      <div class="s-lbl">TVA 5,5%</div>
+      <div class="s-val" id="s-tva">0,00 €</div>
+    </div>
+    <div class="s-sep"></div>
+    <div class="s-item">
+      <div class="s-lbl">Total TTC</div>
+      <div class="s-val" id="s-ttc">0,00 €</div>
+    </div>
+  </div>
+  <div class="remise-pill" id="remise-pill">🏷️ Aucune remise</div>
+</div>
+
+<!-- ══ MAIN ══════════════════════════════════════════════════ -->
+<main>
+  <div class="stitle" style="margin-top:8px">Sélection de produits</div>
+
+  <!-- ── GAMME 1 : BISCUITS SUCRÉS ───────────────────────── -->
+  <div class="gamme">
+    <div class="gamme-hdr">🍪 Biscuits Sucrés <span class="nb">12 références</span></div>
+    <div class="thead">
+      <div>Code</div><div>Désignation</div><div class="tc">PCB</div>
+      <div class="tr">Prix HT/u</div><div class="tr" id="th1-promo">Prix promo</div>
+      <div class="tc">Nb Colis</div><div class="tr">Total HT</div>
+    </div>
+
+    <div class="prow" data-prix="7.65" data-pcb="6">
+      <div class="p-code">8424</div><div class="p-name">Buchette épeautre chocolat 150g</div>
+      <div class="p-pcb">6</div><div class="p-ht">7,65 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.19" data-pcb="12">
+      <div class="p-code">8400</div><div class="p-name">Boudoirs princesse 200g</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,19 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.19" data-pcb="12">
+      <div class="p-code">8298</div><div class="p-name">Bretzel petit épeautre chocolat 175g</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,19 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.10" data-pcb="12">
+      <div class="p-code">47787</div><div class="p-name">Cookies épeautre chocolat &amp; orange 200g</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,10 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.25" data-pcb="12">
+      <div class="p-code">31791</div><div class="p-name">Cookies petit épeautre coco chocolat 150g</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,25 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="2.79" data-pcb="12">
+      <div class="p-code">31786</div><div class="p-name">Cookies amandes chia 200g</div>
+      <div class="p-pcb">12</div><div class="p-ht">2,79 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.25" data-pcb="12">
+      <div class="p-code">55463</div><div class="p-name">Sac 4kg cookies épeautre chocolat orange</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,25 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.99" data-pcb="6">
+      <div class="p-code">8305</div><div class="p-name">Délice châtaigne nappé chocolat 250g</div>
+      <div class="p-pcb">6</div><div class="p-ht">3,99 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.99" data-pcb="6">
+      <div class="p-code">55464</div><div class="p-name">Sac 5kg délice épeautre chocolat</div>
+      <div class="p-pcb">6</div><div class="p-ht">3,99 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="14.29" data-pcb="6">
+      <div class="p-code">8451</div><div class="p-name">Plumcake d'épeautre au yaourt 210g</div>
+      <div class="p-pcb">6</div><div class="p-ht">14,29 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="26.90" data-pcb="1">
+      <div class="p-code">8304</div><div class="p-name">Spéculoos épeautre 230g</div>
+      <div class="p-pcb">1</div><div class="p-ht">26,90 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.29" data-pcb="16">
+      <div class="p-code">31787</div><div class="p-name">Spéculoos petit épeautre chocolat 220g</div>
+      <div class="p-pcb">16</div><div class="p-ht">3,29 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+  </div>
+
+  <!-- ── GAMME 2 : GALETTES SOUFFLÉES ────────────────────── -->
+  <div class="gamme">
+    <div class="gamme-hdr">🫧 Galettes Soufflées <span class="nb">4 références</span></div>
+    <div class="thead">
+      <div>Code</div><div>Désignation</div><div class="tc">PCB</div>
+      <div class="tr">Prix HT/u</div><div class="tr">Prix promo</div>
+      <div class="tc">Nb Colis</div><div class="tr">Total HT</div>
+    </div>
+
+    <div class="prow" data-prix="2.10" data-pcb="12">
+      <div class="p-code">57065</div><div class="p-name">Galette blé chocolat châtaigne 150g</div>
+      <div class="p-pcb">12</div><div class="p-ht">2,10 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="2.10" data-pcb="12">
+      <div class="p-code">8262</div><div class="p-name">Galette épeautre cacao 150g</div>
+      <div class="p-pcb">12</div><div class="p-ht">2,10 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="1.10" data-pcb="12">
+      <div class="p-code">8384</div><div class="p-name">Galette petit épeautre chocolat 150g</div>
+      <div class="p-pcb">12</div><div class="p-ht">1,10 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="2.14" data-pcb="12">
+      <div class="p-code">56854</div><div class="p-name">Galette petit épeautre chocolat myrtille</div>
+      <div class="p-pcb">12</div><div class="p-ht">2,14 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+  </div>
+
+  <!-- ── GAMME 3 : PETIT DEJ ──────────────────────────────── -->
+  <div class="gamme">
+    <div class="gamme-hdr">☀️ Petit Déjeuner <span class="nb">2 références</span></div>
+    <div class="thead">
+      <div>Code</div><div>Désignation</div><div class="tc">PCB</div>
+      <div class="tr">Prix HT/u</div><div class="tr">Prix promo</div>
+      <div class="tc">Nb Colis</div><div class="tr">Total HT</div>
+    </div>
+
+    <div class="prow" data-prix="1.55" data-pcb="12">
+      <div class="p-code">8452</div><div class="p-name">Crakine épeautre 200g</div>
+      <div class="p-pcb">12</div><div class="p-ht">1,55 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+    <div class="prow" data-prix="3.19" data-pcb="12">
+      <div class="p-code">8294</div><div class="p-name">Biscottes épeautre 400g</div>
+      <div class="p-pcb">12</div><div class="p-ht">3,19 €</div><div class="p-promo">—</div>
+      <div class="qwrap"><button class="qbtn" onclick="adj(this,-1)">−</button><input type="number" class="qinp" value="0" min="0" oninput="recalc()"><button class="qbtn" onclick="adj(this,1)">+</button></div>
+      <div class="p-total"></div>
+    </div>
+  </div>
+
+  <!-- ══ RÉCAP ══════════════════════════════════════════════ -->
+  <div class="recap-grid">
+    <div class="rc">
+      <div class="rc-lbl">Nb Colis</div>
+      <div class="rc-val" id="r-colis">0</div>
+      <div class="rc-sub">minimum 10</div>
+    </div>
+    <div class="rc">
+      <div class="rc-lbl">Remise appliquée</div>
+      <div class="rc-val sm" id="r-remise" style="color:rgba(255,255,255,.4)">—</div>
+      <div class="rc-sub" id="r-remise-sub">selon le palier</div>
+    </div>
+    <div class="rc ht">
+      <div class="rc-lbl">Total HT</div>
+      <div class="rc-val sm" id="r-ht">0,00 €</div>
+      <div class="rc-sub" id="r-ht-sub">après remise</div>
+    </div>
+    <div class="rc ttc">
+      <div class="rc-lbl">Total TTC</div>
+      <div class="rc-val sm" id="r-ttc">0,00 €</div>
+      <div class="rc-sub">TVA 5,5% incluse</div>
+    </div>
+  </div>
+
+  <!-- ══ FORMULAIRE CLIENT ══════════════════════════════════ -->
+  <div class="stitle">Vos informations</div>
+  <div class="fcard">
+    <div class="fgrid">
+      <div class="field">
+        <label>Nom de votre magasin <span class="req">*</span></label>
+        <input type="text" id="f-societe" placeholder="Ex : Bio Marché Lyon, La Vie Claire..." required>
+      </div>
+      <div class="field">
+        <label>Votre email <span class="req">*</span></label>
+        <input type="email" id="f-email" placeholder="votre@email.com" required>
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-pdf" onclick="window.print()">💾 Enregistrer / Imprimer en PDF</button>
+    <button class="btn btn-mail" id="btn-send" onclick="envoyerCommande()">📧 Envoyer ma commande</button>
+  </div>
+
+  <div id="success">
+    <h3>✅ Commande envoyée !</h3>
+    <p id="success-detail">Votre commande a été transmise à <strong>cspoto@moulindesmoines.com</strong>. Notre équipe vous contactera très rapidement.</p>
+    <pre id="recap-txt"></pre>
+  </div>
+</main>
+
+<footer>
+  ✅ Certifiés Agriculture Biologique AB &nbsp;·&nbsp;
+  🏭 Fabriqués en Alsace &nbsp;·&nbsp;
+  📅 Offre valable 1er mars – 30 avril 2026 &nbsp;·&nbsp;
+  ✉️ cspoto@moulindesmoines.com
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// PALIERS DE REMISE
+// ═══════════════════════════════════════════════════════════
+const PALIERS = [
+  { seuil: 0,  remise: 0,    label: 'Aucune remise',  pilule: '🏷️ Aucune remise',          pillClass: '',   palId: 'pal-0' },
+  { seuil: 10, remise: 0.07, label: '−7% (Bronze)',   pilule: '⭐ Remise −7% appliquée',   pillClass: 'p1', palId: 'pal-1' },
+  { seuil: 15, remise: 0.10, label: '−10% (Argent)',  pilule: '💎 Remise −10% appliquée',  pillClass: 'p2', palId: 'pal-2' },
+  { seuil: 20, remise: 0.12, label: '−12% (Or)',      pilule: '🏆 Remise −12% appliquée',  pillClass: 'p3', palId: 'pal-3' },
+];
+
+function getPalier(colis) {
+  let p = PALIERS[0];
+  for (const pal of PALIERS) {
+    if (colis >= pal.seuil) p = pal;
+  }
+  return p;
+}
+
+function getNextPalier(colis) {
+  for (const pal of PALIERS) {
+    if (pal.seuil > colis) return pal;
+  }
+  return null;
+}
+
+// ── +/- boutons ──────────────────────────────────────────────
+function adj(btn, d) {
+  const inp = btn.parentElement.querySelector('.qinp');
+  inp.value = Math.max(0, (parseInt(inp.value) || 0) + d);
+  recalc();
+}
+
+// ── Recalcul global ──────────────────────────────────────────
+function recalc() {
+  let colis = 0, unites = 0, htBrut = 0;
+
+  document.querySelectorAll('.prow').forEach(row => {
+    const nb = parseInt(row.querySelector('.qinp').value) || 0;
+    const pcb = parseInt(row.dataset.pcb) || 1;
+    colis  += nb;
+    unites += nb * pcb;
+    htBrut += (parseFloat(row.dataset.prix) || 0) * pcb * nb;
+  });
+
+  const palier = getPalier(colis);
+  const remise = palier.remise;
+  const ht  = htBrut * (1 - remise);
+  const tva = ht * 0.055;
+  const ttc = ht + tva;
+  const next = getNextPalier(colis);
+
+  // --- Mise à jour des prix promo dans le tableau ---
+  document.querySelectorAll('.prow').forEach(row => {
+    const prix   = parseFloat(row.dataset.prix) || 0;
+    const promoEl = row.querySelector('.p-promo');
+    const totEl   = row.querySelector('.p-total');
+    const nb      = parseInt(row.querySelector('.qinp').value) || 0;
+    const pcb     = parseInt(row.dataset.pcb) || 1;
+
+    if (remise > 0) {
+      promoEl.textContent = fmt(prix * (1 - remise)) + ' €';
+      promoEl.style.color = palier.seuil === 10 ? '#c9a84c'
+                          : palier.seuil === 15 ? '#2980b9'
+                          : 'var(--green)';
+    } else {
+      promoEl.textContent = '—';
+      promoEl.style.color = 'var(--muted)';
+    }
+
+    const lineHT = prix * (1 - remise) * pcb * nb;
+    totEl.textContent = nb > 0 ? fmt(lineHT) : '';
+  });
+
+  // --- Sticky bar ---
+  const sc = document.getElementById('s-colis');
+  sc.textContent = colis;
+  sc.className = 's-val ' + (colis === 0 ? '' : remise > 0 ? 'ok' : 'warn');
+  document.getElementById('s-ht').textContent  = fmt(ht);
+  document.getElementById('s-tva').textContent = fmt(tva);
+  document.getElementById('s-ttc').textContent = fmt(ttc);
+
+  const pill = document.getElementById('remise-pill');
+  pill.textContent = palier.pilule;
+  pill.className   = 'remise-pill ' + palier.pillClass;
+
+  // --- Badge header ---
+  const badge = document.getElementById('badge-pct');
+  badge.textContent = remise > 0 ? '−' + Math.round(remise * 100) + '%' : '—';
+
+  // --- Paliers visuels ---
+  PALIERS.forEach(p => {
+    const el = document.getElementById(p.palId);
+    if (el) el.classList.toggle('active', p === palier);
+  });
+
+  // --- Barre de progression ---
+  const bar   = document.getElementById('progress-bar');
+  const plbl  = document.getElementById('progress-label');
+
+  if (!next) {
+    bar.style.width = '100%';
+    plbl.textContent = '🏆 Palier Or atteint — remise maximale −12% appliquée !';
+    plbl.style.color = 'var(--green)';
+  } else {
+    const prev  = PALIERS[PALIERS.indexOf(next) - 1];
+    const range = next.seuil - (prev ? prev.seuil : 0);
+    const done  = colis - (prev ? prev.seuil : 0);
+    const pct   = Math.min(100, Math.round((done / range) * 100));
+    bar.style.width = pct + '%';
+    const manque = next.seuil - colis;
+    plbl.textContent = manque <= 0
+      ? 'Palier atteint !'
+      : `Encore ${manque} colis pour débloquer −${Math.round(next.remise * 100)}%`;
+    plbl.style.color = '';
+  }
+
+  // --- Récap ---
+  const rc = document.getElementById('r-colis');
+  rc.textContent = colis;
+  rc.className = 'rc-val ' + (colis === 0 ? '' : remise > 0 ? 'ok' : 'warn');
+
+  const remiseEl = document.getElementById('r-remise');
+  remiseEl.textContent = remise > 0 ? '−' + Math.round(remise * 100) + '%' : '—';
+  remiseEl.style.color = remise > 0 ? 'var(--gold-l)' : 'rgba(255,255,255,.3)';
+  document.getElementById('r-remise-sub').textContent = remise > 0 ? palier.label : 'selon le palier';
+  document.getElementById('r-ht').textContent = fmt(ht);
+  document.getElementById('r-ht-sub').textContent = remise > 0 ? 'après remise ' + palier.label : 'prix standard';
+  document.getElementById('r-ttc').textContent = fmt(ttc);
+}
+
+function fmt(v) {
+  return v.toFixed(2).replace('.', ',') + ' €';
+}
+function v(id) { return document.getElementById(id).value.trim(); }
+
+// ── Construire le récapitulatif ──────────────────────────────
+function buildRecap() {
+  const magasin = v('f-societe') || '—';
+  const email   = v('f-email')   || '—';
+  const date    = new Date().toLocaleDateString('fr-FR', {day:'2-digit', month:'long', year:'numeric'});
+
+  let lines = [], colis = 0, unites = 0, htBrut = 0;
+  document.querySelectorAll('.prow').forEach(row => {
+    const nb = parseInt(row.querySelector('.qinp').value) || 0;
+    if (!nb) return;
+    const pcb  = parseInt(row.dataset.pcb) || 1;
+    const prix = parseFloat(row.dataset.prix) || 0;
+    const code = row.querySelector('.p-code').textContent.trim();
+    const name = row.querySelector('.p-name').textContent.trim();
+    colis  += nb;
+    unites += nb * pcb;
+    htBrut += prix * pcb * nb;
+    lines.push('[' + code + '] ' + name + '\n'
+      + '         ' + nb + ' colis x ' + pcb + ' u = ' + (nb*pcb) + ' unités  (PU brut : ' + fmt(prix) + ')');
+  });
+
+  const palier = getPalier(colis);
+  const remise = palier.remise;
+  const ht  = htBrut * (1 - remise);
+  const tva = ht * 0.055;
+  const ttc = ht + tva;
+
+  return [
+    '==================================================',
+    'BON DE COMMANDE — PROMOTION MARS / AVRIL 2026',
+    'Moulin des Moines · Biscuits Sucrés Bio',
+    '==================================================',
+    '',
+    'MAGASIN : ' + magasin,
+    'EMAIL   : ' + email,
+    'DATE    : ' + date,
+    '',
+    'PRODUITS COMMANDES :',
+    ...lines,
+    '--------------------------------------------------',
+    'Nb colis    : ' + colis,
+    'Nb unités   : ' + unites,
+    'Total HT brut : ' + fmt(htBrut),
+    'Remise      : ' + palier.label + ' (' + Math.round(remise*100) + '%)',
+    'Total HT    : ' + fmt(ht),
+    'TVA 5,5%    : ' + fmt(tva),
+    'TOTAL TTC   : ' + fmt(ttc),
+    '==================================================',
+  ].join('\n');
+}
+
+// ── Envoyer la commande ──────────────────────────────────────
+async function envoyerCommande() {
+  const magasin = v('f-societe');
+  const email   = v('f-email');
+  if (!magasin || !email) { alert('Merci de renseigner le nom de votre magasin et votre email.'); return; }
+
+  let totalColis = 0;
+  document.querySelectorAll('.qinp').forEach(i => totalColis += parseInt(i.value) || 0);
+  if (totalColis === 0) { alert('Veuillez sélectionner au moins 1 colis avant d\'envoyer.'); return; }
+  if (totalColis < 10) {
+    if (!confirm('Votre commande contient ' + totalColis + ' colis (minimum 10 pour bénéficier d\'une remise).\nVoulez-vous quand même envoyer ?')) return;
+  }
+
+  const recap = buildRecap();
+  document.getElementById('recap-txt').textContent = recap;
+
+  const btn = document.getElementById('btn-send');
+  btn.textContent = '⏳ Envoi en cours...';
+  btn.disabled = true;
+
+  const palier = getPalier(totalColis);
+
+  try {
+    const response = await fetch('https://formsubmit.co/ajax/cspoto@moulindesmoines.com', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        _subject:  'Nouvelle commande — ' + magasin + ' — ' + new Date().toLocaleDateString('fr-FR'),
+        _template: 'box',
+        _captcha:  'false',
+        magasin:   magasin,
+        email_client: email,
+        remise_appliquee: palier.label,
+        commande:  recap
+      })
+    });
+    const result = await response.json();
+    if (result.success === 'true' || result.success === true) {
+      btn.textContent = '✅ Commande envoyée !';
+      const s = document.getElementById('success');
+      s.style.display = 'block';
+      s.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else { throw new Error('Réponse inattendue'); }
+  } catch(err) {
+    btn.textContent = '📧 Envoyer ma commande';
+    btn.disabled = false;
+    alert('Erreur lors de l\'envoi. Vérifiez votre connexion.\nDétail : ' + err.message);
+  }
+}
+
+recalc();
+</script>
+</body>
+</html>
