@@ -3,136 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOAC Dev | Expertise Digitale</title>
+    <title>LOAC Dev | Architecture Logicielle & solutions SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --dark-blue: #0a2540; /* Couleur tirée de votre logo */
-            --light-blue: #7fa1c3;
+            --abysse: #0a2540;   /* Bleu foncé du logo */
+            --cyan: #00d4ff;     /* Cyan électrique du Concept A */
             --white: #ffffff;
-            --bg-gray: #f4f7f9;
+            --light-bg: #f8fafc;
+            --text: #334155;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin: 0;
-            color: var(--dark-blue);
-            background-color: var(--bg-gray);
+            font-family: 'Montserrat', sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light-bg);
+            scroll-behavior: smooth;
         }
 
+        /* HEADER & LOGO */
         header {
             background: var(--white);
-            padding: 1.5rem 5%;
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
             position: sticky;
             top: 0;
             z-index: 1000;
         }
 
-        .logo-container img {
-            height: 60px; /* Taille optimisée pour la navigation */
-            display: block;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-svg {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--abysse);
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        .brand-sub {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--cyan);
+            font-weight: 600;
+            margin-top: 4px;
         }
 
         nav a {
             margin-left: 25px;
             text-decoration: none;
-            color: var(--dark-blue);
+            color: var(--abysse);
             font-weight: 600;
             font-size: 0.9rem;
-            transition: color 0.3s;
+            transition: 0.3s;
         }
 
         nav a:hover {
-            color: var(--light-blue);
+            color: var(--cyan);
         }
 
+        /* HERO SECTION */
         .hero {
-            padding: 120px 10%;
-            background: linear-gradient(rgba(10, 37, 64, 0.9), rgba(10, 37, 64, 0.9)), 
-                        url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1350&q=80');
-            background-size: cover;
+            padding: 120px 10% 160px;
+            background: linear-gradient(135deg, var(--abysse) 0%, #163a5f 100%);
             color: var(--white);
             text-align: center;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
         }
 
-        .hero h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
 
+        .hero h1 span {
+            color: var(--cyan);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            opacity: 0.9;
+        }
+
+        /* SERVICES */
         .services {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 30px;
-            padding: 80px 10%;
+            padding: 60px 10%;
+            margin-top: -80px;
         }
 
         .card {
             background: var(--white);
             padding: 40px;
-            border-radius: 12px;
+            border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-            border-bottom: 4px solid var(--light-blue);
+            transition: 0.3s;
+            border-top: 4px solid transparent;
         }
 
+        .card:hover {
+            transform: translateY(-10px);
+            border-top: 4px solid var(--cyan);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: var(--abysse);
+            font-size: 1.4rem;
+        }
+
+        /* BOUTON */
+        .btn {
+            display: inline-block;
+            background: var(--cyan);
+            color: var(--abysse);
+            padding: 15px 35px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+        }
+
+        /* FOOTER */
         footer {
-            background: var(--dark-blue);
+            background: var(--abysse);
             color: var(--white);
-            padding: 60px 10% 20px;
+            padding: 80px 10% 40px;
             text-align: center;
         }
 
-        .btn {
-            background: var(--light-blue);
-            color: white;
-            padding: 15px 35px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-weight: bold;
-            display: inline-block;
-            margin-top: 30px;
+        .footer-logo-svg {
+            width: 60px;
+            margin-bottom: 20px;
+            filter: brightness(0) invert(1);
+        }
+
+        .copyright {
+            margin-top: 40px;
+            font-size: 0.8rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            nav { display: none; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-container">
-            <img src="logo loac dev.jpg" alt="LOAC Dev Logo">
-        </div>
+        <a href="#" class="logo-container">
+            <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 10V90H90V70H30V10H10Z" fill="#0A2540"/>
+                <path d="M40 30V60H70V40H50V30H40Z" fill="#0A2540"/>
+                <rect x="75" y="75" width="15" height="15" fill="#00D4FF"/>
+            </svg>
+            <div class="logo-text">
+                <span class="brand-name">LOAC</span>
+                <span class="brand-sub">DEV & ARCHITECTURE</span>
+            </div>
+        </a>
         <nav>
-            <a href="#accueil">Accueil</a>
             <a href="#services">Expertise</a>
+            <a href="#projets">Projets</a>
             <a href="#contact">Contact</a>
         </nav>
     </header>
 
-    <section class="hero" id="accueil">
-        <h1>LOAC Dev</h1>
-        <p>Architecte de vos ambitions numériques.</p>
+    <section class="hero">
+        <h1>Innover par le <span>Code</span></h1>
+        <p>Expertise en architecture SaaS et développement d'applications critiques de haute performance.</p>
         <a href="#contact" class="btn">Démarrer un projet</a>
     </section>
 
     <section class="services" id="services">
         <div class="card">
-            <h3>Développement Full-Stack</h3>
-            <p>Solutions sur mesure performantes et sécurisées pour vos besoins métiers.</p>
+            <h3>Architecture Cloud</h3>
+            <p>Conception de systèmes scalables et résilients sur les infrastructures AWS et OVHcloud.</p>
         </div>
         <div class="card">
-            <h3>Transformation Digitale</h3>
-            <p>Accompagnement dans l'évolution de vos outils et processus numériques.</p>
+            <h3>Solutions SaaS</h3>
+            <p>Développement de plateformes logicielles modernes, sécurisées et prêtes pour le marché.</p>
         </div>
         <div class="card">
-            <h3>Maintenance & Evolution</h3>
-            <p>Suivi technique rigoureux pour garantir la pérennité de vos applications.</p>
+            <h3>Audit Technique</h3>
+            <p>Analyse de performance et optimisation de code pour vos applications existantes.</p>
         </div>
     </section>
 
     <footer id="contact">
-        <img src="logo loac dev.jpg" alt="LOAC Dev White" style="filter: brightness(0) invert(1); height: 50px; margin-bottom: 20px;">
-        <p>Contact : contact@loacdev.fr</p>
-        <hr style="opacity: 0.1; margin: 30px 0;">
-        <p style="font-size: 0.8rem; opacity: 0.6;">&copy; 2026 LOAC Dev. Tous droits réservés.</p>
+        <svg class="footer-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 10V90H90V70H30V10H10Z" fill="white"/>
+            <rect x="75" y="75" width="15" height="15" fill="#00D4FF"/>
+        </svg>
+        <h2>LOAC Dev</h2>
+        <p>Partenaire technologique de votre croissance.</p>
+        <p style="margin-top: 20px; font-weight: bold; color: var(--cyan);">contact@loacdev.fr</p>
+        <div class="copyright">
+            &copy; 2026 LOAC Dev. Tous droits réservés.
+        </div>
     </footer>
 
 </body>
