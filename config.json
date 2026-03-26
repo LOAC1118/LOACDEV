@@ -1,0 +1,35 @@
+{
+  "societe": {
+    "nom": "Votre Société",
+    "slogan": "Votre slogan ici",
+    "logo_url": "",
+    "email_commandes": "commandes@votresociete.fr",
+    "email_expediteur": "noreply@votresociete.fr",
+    "telephone": "",
+    "adresse": "",
+    "site_web": "",
+    "siret": ""
+  },
+  "collection": {
+    "nom": "Catalogue 2026",
+    "description": "",
+    "date_limite_commande": "",
+    "delai_livraison": "Livraison sous 5 jours ouvrés.",
+    "conditions": ""
+  },
+  "charte": {
+    "couleur_principale": "#2d5a27",
+    "couleur_secondaire": "#f5f0e8",
+    "couleur_accent": "#c8a96e",
+    "couleur_texte": "#1a1a1a"
+  },
+  "remises": [
+    { "id": "r0", "label": "Tarif standard", "pct": 0 }
+  ],
+  "catalogue": [],
+  "meta": {
+    "version": "1.0",
+    "cree_le": "",
+    "modifie_le": ""
+  }
+}

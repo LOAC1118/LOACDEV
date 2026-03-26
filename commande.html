@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bon de commande</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --c-main:    #2d5a27;
+  --c-bg:      #f5f0e8;
+  --c-accent:  #c8a96e;
+  --c-text:    #1a1a1a;
+  --c-surface: #ffffff;
+  --c-border:  #ddd8ce;
+  --c-muted:   #6b6560;
+  --c-main-l:  #e8f0e6;
+  --c-main-d:  #1e3d1b;
+  --radius:    8px;
+  --shadow:    0 2px 12px rgba(0,0,0,.08);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,.14);
+  --font-head: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 15px; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--c-bg);
+  color: var(--c-text);
+  min-height: 100vh;
+  padding: 0 0 4rem;
+}
+
+/* ── HEADER BDC ── */
+.bdc-topbar {
+  background: var(--c-main);
+  color: white;
+  padding: 1.25rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: 0 2px 16px rgba(0,0,0,.2);
+}
+.bdc-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.bdc-logo-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255,255,255,.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bdc-logo-wrap img { width: 100%; height: 100%; object-fit: contain; }
+.bdc-logo-placeholder { font-size: 1.4rem; }
+.bdc-brand-text h1 {
+  font-family: var(--font-head);
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+.bdc-brand-text p {
+  font-size: 0.78rem;
+  opacity: 0.75;
+  margin-top: 2px;
+}
+.bdc-meta {
+  text-align: right;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+.bdc-meta strong { font-weight: 600; }
+
+/* ── PAGE WRAP ── */
+.page {
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 0 1.25rem;
+}
+
+/* ── CARDS ── */
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── FORM FIELDS ── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.field { display: flex; flex-direction: column; gap: 0.35rem; }
+.field.full { grid-column: span 2; }
+label { font-size: 0.8rem; font-weight: 600; }
+label .req { color: var(--c-accent); }
+input[type=text], input[type=email], input[type=tel], select {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  transition: all .15s;
+  width: 100%;
+}
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--c-main);
+  box-shadow: 0 0 0 3px rgba(45,90,39,.1);
+  background: white;
+}
+textarea {
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  background: var(--c-bg);
+  color: var(--c-text);
+  resize: vertical;
+  min-height: 70px;
+  width: 100%;
+  transition: all .15s;
+}
+textarea:focus {
+  outline: none;
+  border-color: var(--c-main);
+  box-shadow: 0 0 0 3px rgba(45,90,39,.1);
+  background: white;
+}
+
+/* ── REMISE TAG ── */
+.remise-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.9rem;
+  background: var(--c-main-l);
+  color: var(--c-main);
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  border: 1px solid rgba(45,90,39,.2);
+}
+.remise-tag.hidden { display: none; }
+
+/* ── CATALOGUE PRODUITS ── */
+.catalogue-section { margin-bottom: 1.25rem; }
+.cat-header {
+  background: var(--c-main);
+  color: white;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius) var(--radius) 0 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.prod-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.prod-table th {
+  background: var(--c-bg);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+  padding: 0.55rem 0.85rem;
+  text-align: left;
+  border-bottom: 1px solid var(--c-border);
+}
+.prod-table th.right { text-align: right; }
+.prod-table th.center { text-align: center; }
+.prod-table td {
+  padding: 0.5rem 0.85rem;
+  border-bottom: 1px solid var(--c-border);
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
+.prod-table tr:last-child td { border-bottom: none; }
+.prod-table tr:hover td { background: #fafaf8; }
+.col-ref { font-family: var(--font-mono); font-size: 0.78rem; color: var(--c-muted); width: 90px; }
+.col-nom { min-width: 160px; font-weight: 500; }
+.col-px { width: 90px; text-align: right; color: var(--c-muted); }
+.col-colis { width: 70px; text-align: center; color: var(--c-muted); font-size: 0.78rem; }
+.col-qty { width: 100px; text-align: center; }
+.col-total { width: 100px; text-align: right; font-weight: 600; font-family: var(--font-mono); }
+.qty-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+.qty-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--c-border);
+  background: white;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .15s;
+  color: var(--c-main);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.qty-btn:hover { background: var(--c-main); color: white; border-color: var(--c-main); }
+.qty-input {
+  width: 36px;
+  text-align: center;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 3px;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+.qty-input:focus { outline: none; border-color: var(--c-main); }
+.total-cell { color: var(--c-main); }
+.total-cell.zero { color: var(--c-muted); font-weight: 400; }
+
+/* ── TOTAUX ── */
+.totals-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow);
+}
+.totals-grid {
+  padding: 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  padding: 0.2rem 0;
+}
+.total-row.border-top { border-top: 1px solid var(--c-border); padding-top: 0.6rem; margin-top: 0.15rem; }
+.total-row.remise { color: var(--c-muted); }
+.total-row.ht-net strong { font-weight: 700; }
+.total-ttc {
+  background: var(--c-main);
+  color: white;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.total-ttc .lbl { font-size: 0.8rem; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; opacity: .9; }
+.total-ttc .val { font-family: var(--font-head); font-size: 1.6rem; font-weight: 700; }
+
+/* ── SUBMIT BAR ── */
+.submit-bar {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+.submit-info { font-size: 0.83rem; color: var(--c-muted); }
+.submit-info strong { color: var(--c-text); font-weight: 700; display: block; margin-bottom: 2px; }
+.btn-submit {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  padding: 0.8rem 2rem;
+  background: var(--c-main);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: all .2s;
+  box-shadow: 0 4px 16px rgba(45,90,39,.3);
+}
+.btn-submit:hover { background: var(--c-main-d); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,90,39,.35); }
+.btn-submit:active { transform: translateY(0); }
+.btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  background: white;
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.empty-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+.empty-state h3 { font-size: 1rem; margin-bottom: 0.35rem; }
+.empty-state p { font-size: 0.83rem; color: var(--c-muted); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.85rem 1.35rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all .3s cubic-bezier(.34,1.56,.64,1);
+  max-width: 360px;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.success { background: var(--c-main); color: white; }
+.toast.error { background: #c0392b; color: white; }
+.toast.info { background: #3a7bd5; color: white; }
+
+/* ── OVERLAY SUCCESS ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.overlay.show { display: flex; }
+.overlay-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn {
+  from { transform: scale(.85); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+.overlay-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+.overlay-card h2 { font-family: var(--font-head); font-size: 1.5rem; margin-bottom: 0.5rem; }
+.overlay-card p { color: var(--c-muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 1.5rem; }
+.btn-new {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.7rem 2rem;
+  background: var(--c-main);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-new:hover { background: var(--c-main-d); }
+
+/* ── NOTICE BANNER ── */
+.notice {
+  border-radius: var(--radius);
+  padding: 0.85rem 1.1rem;
+  font-size: 0.83rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+.notice.info { background: #eef3fc; border: 1px solid #cad9f5; color: #2c4a8a; }
+.notice.warn { background: #fdf6ec; border: 1px solid #f0d6a2; color: #7a5200; }
+.notice.err  { background: #fdf0ee; border: 1px solid #f0c5be; color: #7a1e0e; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .form-grid { grid-template-columns: 1fr; }
+  .field.full { grid-column: span 1; }
+  .bdc-topbar { flex-direction: column; align-items: flex-start; }
+  .bdc-meta { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="bdc-topbar" id="bdc-topbar">
+  <div class="bdc-brand">
+    <div class="bdc-logo-wrap" id="logo-wrap">
+      <span class="bdc-logo-placeholder" id="logo-placeholder">🌿</span>
+    </div>
+    <div class="bdc-brand-text">
+      <h1 id="brand-nom">Chargement…</h1>
+      <p id="brand-collection">Bon de commande</p>
+    </div>
+  </div>
+  <div class="bdc-meta" id="bdc-meta">
+    <div id="meta-date"></div>
+    <div id="meta-ref"></div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page" id="main-page">
+
+  <!-- LOADING -->
+  <div id="loading-state" style="text-align:center;padding:3rem">
+    <div style="font-size:2rem;margin-bottom:.75rem">⏳</div>
+    <p style="color:var(--c-muted)">Chargement du catalogue…</p>
+  </div>
+
+  <!-- ERROR -->
+  <div id="error-state" style="display:none">
+    <div class="notice err">
+      <span>⚠️</span>
+      <div>
+        <strong>Catalogue non disponible</strong><br>
+        Le fichier <code>config.json</code> n'a pas pu être chargé. Vérifiez que les trois fichiers (admin.html, commande.html, config.json) sont dans le même dossier.
+        <br><a href="admin.html" style="color:inherit;font-weight:700">→ Ouvrir l'administration</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <div id="bdc-form" style="display:none">
+
+    <!-- INFO REVENDEUR -->
+    <div class="card">
+      <div class="card-title">🏪 Informations revendeur</div>
+      <div class="form-grid">
+        <div class="field">
+          <label>Magasin / Enseigne <span class="req">*</span></label>
+          <input type="text" id="r-magasin" placeholder="Biocoop Centre-Ville" oninput="updateRef()">
+        </div>
+        <div class="field">
+          <label>Nom du responsable</label>
+          <input type="text" id="r-contact" placeholder="Marie Dupont">
+        </div>
+        <div class="field">
+          <label>Email de confirmation <span class="req">*</span></label>
+          <input type="email" id="r-email" placeholder="achat@monmagasin.fr">
+        </div>
+        <div class="field">
+          <label>Téléphone</label>
+          <input type="tel" id="r-tel" placeholder="06 12 34 56 78">
+        </div>
+        <div class="field">
+          <label>Ville</label>
+          <input type="text" id="r-ville" placeholder="Strasbourg">
+        </div>
+        <div class="field">
+          <label>Profil remise</label>
+          <select id="r-remise" onchange="applyRemise()">
+            <option value="0">Tarif standard (0%)</option>
+          </select>
+        </div>
+      </div>
+      <div class="remise-tag hidden" id="remise-tag">
+        🏷️ Remise <span id="remise-pct-display">0</span>% appliquée
+      </div>
+    </div>
+
+    <!-- CATALOGUE -->
+    <div id="catalogue-wrap"></div>
+
+    <!-- REMARQUES -->
+    <div class="card">
+      <div class="card-title">💬 Remarques</div>
+      <textarea id="r-remarques" placeholder="Instructions de livraison, demandes spéciales, date souhaitée…"></textarea>
+    </div>
+
+    <!-- TOTAUX -->
+    <div class="totals-card">
+      <div class="totals-grid">
+        <div class="total-row">
+          <span>Sous-total HT</span>
+          <span id="t-ht">0,00 €</span>
+        </div>
+        <div class="total-row remise" id="t-remise-row" style="display:none">
+          <span>Remise <span id="t-remise-pct">0</span>%</span>
+          <span id="t-remise">−0,00 €</span>
+        </div>
+        <div class="total-row ht-net border-top">
+          <strong>Total HT après remise</strong>
+          <strong id="t-ht-net">0,00 €</strong>
+        </div>
+        <div class="total-row">
+          <span>TVA</span>
+          <span id="t-tva">0,00 €</span>
+        </div>
+      </div>
+      <div class="total-ttc">
+        <span class="lbl">Total TTC</span>
+        <span class="val" id="t-ttc">0,00 €</span>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div class="submit-bar">
+      <div class="submit-info">
+        <strong id="submit-email-display">—</strong>
+        <span id="submit-footer-text">Votre commande sera transmise par email.</span>
+      </div>
+      <button class="btn-submit" id="btn-submit" onclick="submitBDC()">
+        📨 Envoyer la commande
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- SUCCESS OVERLAY -->
+<div class="overlay" id="success-overlay">
+  <div class="overlay-card">
+    <div class="overlay-icon">✅</div>
+    <h2>Commande envoyée !</h2>
+    <p id="success-msg">Votre bon de commande a bien été transmis. Vous recevrez une confirmation par email.</p>
+    <button class="btn-new" onclick="newOrder()">Nouvelle commande</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────
+let cfg = null;
+let remisePct = 0;
+const CONFIG_KEY = 'crm_config';
+
+// ── INIT ────────────────────────────────────────────────────
+window.onload = () => {
+  loadConfig();
+};
+
+function loadConfig() {
+  // 1. Essai depuis localStorage (si admin a sauvegardé)
+  try {
+    const raw = localStorage.getItem(CONFIG_KEY);
+    if (raw) {
+      cfg = JSON.parse(raw);
+      initBDC();
+      return;
+    }
+  } catch(e) {}
+
+  // 2. Essai depuis config.json (même dossier)
+  fetch('config.json?t=' + Date.now())
+    .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+    .then(data => {
+      cfg = data;
+      initBDC();
+    })
+    .catch(() => {
+      document.getElementById('loading-state').style.display = 'none';
+      document.getElementById('error-state').style.display = 'block';
+    });
+}
+
+function initBDC() {
+  applyTheme();
+  fillHeader();
+  fillRemises();
+  renderCatalogue();
+  document.getElementById('loading-state').style.display = 'none';
+  document.getElementById('bdc-form').style.display = 'block';
+  generateRef();
+}
+
+// ── THEME ────────────────────────────────────────────────────
+function applyTheme() {
+  if (!cfg.charte) return;
+  const ch = cfg.charte;
+  const root = document.documentElement;
+  if (ch.couleur_principale) root.style.setProperty('--c-main', ch.couleur_principale);
+  if (ch.couleur_secondaire) root.style.setProperty('--c-bg', ch.couleur_secondaire);
+  if (ch.couleur_accent)     root.style.setProperty('--c-accent', ch.couleur_accent);
+  if (ch.couleur_texte)      root.style.setProperty('--c-text', ch.couleur_texte);
+}
+
+// ── HEADER ────────────────────────────────────────────────────
+function fillHeader() {
+  const s = cfg.societe || {};
+  const c = cfg.collection || {};
+  document.getElementById('brand-nom').textContent = s.nom || 'Bon de commande';
+  document.getElementById('brand-collection').textContent = c.nom || '';
+  document.title = 'Commande — ' + (s.nom || '');
+  if (s.logo_url) {
+    document.getElementById('logo-placeholder').style.display = 'none';
+    const img = document.createElement('img');
+    img.src = s.logo_url;
+    img.alt = s.nom;
+    img.onerror = () => { img.remove(); document.getElementById('logo-placeholder').style.display = ''; };
+    document.getElementById('logo-wrap').appendChild(img);
+  }
+  document.getElementById('meta-date').textContent = 'Date : ' + new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'});
+  // Submit bar
+  if (s.email_commandes) document.getElementById('submit-email-display').textContent = s.email_commandes;
+  let footer = '';
+  if (c.date_limite_commande) footer += 'Commandes avant le ' + c.date_limite_commande + '.';
+  if (c.delai_livraison) footer += (footer ? ' ' : '') + c.delai_livraison;
+  if (!footer) footer = 'Votre commande sera transmise par email.';
+  document.getElementById('submit-footer-text').textContent = footer;
+}
+
+function generateRef() {
+  const now = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const ref = 'BDC-' + now.getFullYear() + pad(now.getMonth()+1) + pad(now.getDate()) + '-' + Math.random().toString(36).slice(2,6).toUpperCase();
+  document.getElementById('meta-ref').textContent = 'Réf : ' + ref;
+  window._bdcRef = ref;
+}
+
+function updateRef() {
+  const mag = document.getElementById('r-magasin').value.trim();
+  if (mag) {
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const slug = mag.slice(0,6).toUpperCase().replace(/[^A-Z0-9]/g,'');
+    window._bdcRef = 'BDC-' + now.getFullYear() + pad(now.getMonth()+1) + '-' + slug + '-' + Math.random().toString(36).slice(2,4).toUpperCase();
+    document.getElementById('meta-ref').textContent = 'Réf : ' + window._bdcRef;
+  }
+}
+
+// ── REMISES ────────────────────────────────────────────────────
+function fillRemises() {
+  const sel = document.getElementById('r-remise');
+  sel.innerHTML = '';
+  (cfg.remises || [{ label:'Tarif standard', pct:0 }]).forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.pct;
+    opt.textContent = r.label + (r.pct > 0 ? ' (−' + r.pct + '%)' : '');
+    sel.appendChild(opt);
+  });
+  applyRemise();
+}
+
+function applyRemise() {
+  remisePct = parseFloat(document.getElementById('r-remise').value) || 0;
+  const tag = document.getElementById('remise-tag');
+  if (remisePct > 0) {
+    document.getElementById('remise-pct-display').textContent = remisePct;
+    tag.classList.remove('hidden');
+  } else {
+    tag.classList.add('hidden');
+  }
+  recalc();
+}
+
+// ── CATALOGUE ────────────────────────────────────────────────────
+function renderCatalogue() {
+  const wrap = document.getElementById('catalogue-wrap');
+  const produits = cfg.catalogue || [];
+  if (!produits.length) {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><h3>Catalogue vide</h3><p>Aucun produit configuré. <a href="admin.html">→ Administration</a></p></div>`;
+    return;
+  }
+  // Grouper par catégorie
+  const cats = {};
+  produits.forEach((p, i) => {
+    const c = p.categorie || 'Autres';
+    if (!cats[c]) cats[c] = [];
+    cats[c].push({...p, _idx: i});
+  });
+  let html = '';
+  Object.entries(cats).forEach(([cat, prods]) => {
+    html += `
+    <div class="catalogue-section">
+      <div class="cat-header">📦 ${cat}</div>
+      <table class="prod-table">
+        <thead><tr>
+          <th class="col-ref">Réf.</th>
+          <th class="col-nom">Désignation</th>
+          <th class="col-px right">Prix HT</th>
+          <th class="col-colis center">Colisage</th>
+          <th class="col-qty center">Qté</th>
+          <th class="col-total right">Total HT</th>
+        </tr></thead>
+        <tbody>
+    `;
+    prods.forEach(p => {
+      html += `
+        <tr id="row-${p._idx}">
+          <td class="col-ref">${esc(p.reference)}</td>
+          <td class="col-nom">${esc(p.nom)}</td>
+          <td class="col-px">${fmtPrix(p.prix_ht)} €</td>
+          <td class="col-colis">${p.colisage || 1}</td>
+          <td class="col-qty">
+            <div class="qty-wrap">
+              <button class="qty-btn" onclick="changeQty(${p._idx}, -1)">−</button>
+              <input class="qty-input" type="number" id="qty-${p._idx}" value="0" min="0" onchange="onQtyChange(${p._idx})">
+              <button class="qty-btn" onclick="changeQty(${p._idx}, 1)">＋</button>
+            </div>
+          </td>
+          <td class="col-total" id="total-${p._idx}"><span class="zero">—</span></td>
+        </tr>
+      `;
+    });
+    html += '</tbody></table></div>';
+  });
+  wrap.innerHTML = html;
+}
+
+function changeQty(idx, delta) {
+  const input = document.getElementById('qty-' + idx);
+  const cur = parseInt(input.value) || 0;
+  const newVal = Math.max(0, cur + delta);
+  input.value = newVal;
+  onQtyChange(idx);
+}
+
+function onQtyChange(idx) {
+  const input = document.getElementById('qty-' + idx);
+  const qty = Math.max(0, parseInt(input.value) || 0);
+  input.value = qty;
+  const p = cfg.catalogue[idx];
+  const ht = p.prix_ht * qty;
+  const cell = document.getElementById('total-' + idx);
+  if (qty > 0) {
+    cell.innerHTML = '<span class="total-cell">' + fmtPrix(ht) + ' €</span>';
+  } else {
+    cell.innerHTML = '<span class="zero">—</span>';
+  }
+  recalc();
+}
+
+function recalc() {
+  let totalHT = 0;
+  let totalTVA = 0;
+  (cfg.catalogue || []).forEach((p, i) => {
+    const qty = parseInt(document.getElementById('qty-' + i)?.value) || 0;
+    const ht = p.prix_ht * qty;
+    totalHT += ht;
+    totalTVA += ht * (p.tva / 100);
+  });
+  const remise = totalHT * remisePct / 100;
+  const htNet = totalHT - remise;
+  const htNetTVA = totalTVA * (1 - remisePct / 100);
+  const ttc = htNet + htNetTVA;
+  document.getElementById('t-ht').textContent = fmtPrix(totalHT) + ' €';
+  document.getElementById('t-ht-net').textContent = fmtPrix(htNet) + ' €';
+  document.getElementById('t-tva').textContent = fmtPrix(htNetTVA) + ' €';
+  document.getElementById('t-ttc').textContent = fmtPrix(ttc) + ' €';
+  const remiseRow = document.getElementById('t-remise-row');
+  if (remisePct > 0 && totalHT > 0) {
+    remiseRow.style.display = 'flex';
+    document.getElementById('t-remise-pct').textContent = remisePct;
+    document.getElementById('t-remise').textContent = '−' + fmtPrix(remise) + ' €';
+  } else {
+    remiseRow.style.display = 'none';
+  }
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────
+async function submitBDC() {
+  const magasin = document.getElementById('r-magasin').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  if (!magasin) { toast('Veuillez saisir le nom du magasin', 'error'); return; }
+  if (!email || !email.includes('@')) { toast('Email de confirmation invalide', 'error'); return; }
+
+  // Collecter les lignes
+  const lignes = [];
+  (cfg.catalogue || []).forEach((p, i) => {
+    const qty = parseInt(document.getElementById('qty-' + i)?.value) || 0;
+    if (qty > 0) lignes.push({ ref: p.reference, nom: p.nom, cat: p.categorie, qty, prix: p.prix_ht, tva: p.tva });
+  });
+  if (!lignes.length) { toast('Veuillez commander au moins un produit', 'error'); return; }
+
+  // Totaux
+  const totalHT = lignes.reduce((s, l) => s + l.prix * l.qty, 0);
+  const remise = totalHT * remisePct / 100;
+  const htNet = totalHT - remise;
+  const totalTVA = lignes.reduce((s, l) => s + l.prix * l.qty * (l.tva / 100), 0) * (1 - remisePct / 100);
+  const ttc = htNet + totalTVA;
+
+  // Composer le corps email
+  const societeNom = cfg.societe?.nom || '';
+  const collectionNom = cfg.collection?.nom || '';
+  let body = `=== BON DE COMMANDE ===\n`;
+  body += `Référence : ${window._bdcRef}\n`;
+  body += `Société : ${societeNom} — ${collectionNom}\n`;
+  body += `Date : ${new Date().toLocaleDateString('fr-FR')}\n\n`;
+  body += `--- REVENDEUR ---\n`;
+  body += `Magasin : ${magasin}\n`;
+  body += `Contact : ${document.getElementById('r-contact').value}\n`;
+  body += `Email : ${email}\n`;
+  body += `Tél : ${document.getElementById('r-tel').value}\n`;
+  body += `Ville : ${document.getElementById('r-ville').value}\n`;
+  body += `Profil remise : ${document.getElementById('r-remise').options[document.getElementById('r-remise').selectedIndex].text}\n\n`;
+  body += `--- PRODUITS ---\n`;
+  lignes.forEach(l => {
+    body += `[${l.ref}] ${l.nom} | Qté: ${l.qty} | PU HT: ${l.prix.toFixed(2)}€ | Total HT: ${(l.prix * l.qty).toFixed(2)}€\n`;
+  });
+  body += `\n--- TOTAUX ---\n`;
+  body += `Sous-total HT : ${fmtPrix(totalHT)} €\n`;
+  if (remisePct > 0) body += `Remise ${remisePct}% : -${fmtPrix(remise)} €\n`;
+  body += `Total HT net : ${fmtPrix(htNet)} €\n`;
+  body += `TVA : ${fmtPrix(totalTVA)} €\n`;
+  body += `TOTAL TTC : ${fmtPrix(ttc)} €\n`;
+  const remarques = document.getElementById('r-remarques').value.trim();
+  if (remarques) body += `\n--- REMARQUES ---\n${remarques}\n`;
+
+  // Envoi via FormSubmit
+  const destEmail = cfg.societe?.email_commandes;
+  if (!destEmail) { toast('Email de destination non configuré — voir admin', 'error'); return; }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = '⏳ Envoi en cours…';
+
+  try {
+    const formData = new FormData();
+    formData.append('_subject', `${societeNom} — Commande ${magasin} — ${window._bdcRef}`);
+    formData.append('_replyto', email);
+    formData.append('_template', 'box');
+    formData.append('Référence', window._bdcRef);
+    formData.append('Magasin', magasin);
+    formData.append('Email revendeur', email);
+    formData.append('Détail commande', body);
+    formData.append('_cc', email);
+
+    const res = await fetch('https://formsubmit.co/' + destEmail, {
+      method: 'POST',
+      headers: { 'Accept': 'application/json' },
+      body: formData
+    });
+    const data = await res.json();
+    if (data.success === 'true' || data.success === true) {
+      document.getElementById('success-msg').textContent =
+        `Votre commande (${window._bdcRef}) a été transmise à ${societeNom}. Une copie a été envoyée à ${email}.`;
+      document.getElementById('success-overlay').classList.add('show');
+    } else {
+      throw new Error('FormSubmit error');
+    }
+  } catch(e) {
+    toast('Erreur lors de l\'envoi. Réessayez ou contactez le producteur directement.', 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📨 Envoyer la commande';
+  }
+}
+
+function newOrder() {
+  document.getElementById('success-overlay').classList.remove('show');
+  document.getElementById('r-magasin').value = '';
+  document.getElementById('r-contact').value = '';
+  document.getElementById('r-email').value = '';
+  document.getElementById('r-tel').value = '';
+  document.getElementById('r-ville').value = '';
+  document.getElementById('r-remarques').value = '';
+  document.getElementById('r-remise').selectedIndex = 0;
+  applyRemise();
+  (cfg.catalogue || []).forEach((_, i) => {
+    const el = document.getElementById('qty-' + i);
+    if (el) { el.value = 0; }
+    const cell = document.getElementById('total-' + i);
+    if (cell) cell.innerHTML = '<span class="zero">—</span>';
+  });
+  recalc();
+  generateRef();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── UTILS ────────────────────────────────────────────────────
+function fmtPrix(n) {
+  return (Math.round(n * 100) / 100).toLocaleString('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+function esc(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(msg, type = 'success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>
