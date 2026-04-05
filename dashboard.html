@@ -264,12 +264,297 @@
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin   { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE — TABLETTE (≤ 1024px)
+    ═══════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .sidebar { width: 220px; }
+      .page { padding: 24px 20px; }
+      .stats-row { grid-template-columns: repeat(3,1fr); gap: 12px; }
+      .crm-grid { grid-template-columns: 1fr; gap: 16px; }
+      .support-grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .setup-wrap { grid-template-columns: 190px 1fr; gap: 14px; }
+      .setup-fg2 { grid-template-columns: 1fr 1fr; }
+      .setup-fg3 { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE — MOBILE (≤ 768px)
+       Sidebar → bottom navigation bar
+    ═══════════════════════════════════════ */
+    @media (max-width: 768px) {
+      /* Corps : scroll vertical, espace en bas pour la bottom nav */
+      body {
+        flex-direction: column;
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      /* Sidebar → cachée sur mobile, remplacée par bottom nav */
+      .sidebar {
+        display: none;
+      }
+
+      /* Bottom navigation bar */
+      .bottom-nav {
+        display: flex !important;
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        height: 60px;
+        background: linear-gradient(170deg, var(--navy) 0%, #162340 100%);
+        z-index: 200;
+        box-shadow: 0 -2px 16px rgba(30,45,78,.25);
+        justify-content: space-around;
+        align-items: stretch;
+      }
+      .bn-item {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        color: rgba(255,255,255,.5);
+        cursor: pointer;
+        font-size: .58rem;
+        font-weight: 600;
+        letter-spacing: .03em;
+        border: none;
+        background: none;
+        font-family: 'Outfit', sans-serif;
+        transition: color .2s;
+        padding: 6px 4px;
+        text-align: center;
+      }
+      .bn-item .bn-icon { font-size: 1.25rem; line-height: 1; }
+      .bn-item.active { color: var(--teal); }
+      .bn-item:hover  { color: rgba(255,255,255,.85); }
+
+      /* Bouton menu hamburger → ouvre drawer sidebar */
+      .mobile-topbar {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        height: 52px;
+        background: linear-gradient(170deg, var(--navy) 0%, #162340 100%);
+        flex-shrink: 0;
+        box-shadow: 0 2px 10px rgba(30,45,78,.2);
+      }
+      .mobile-topbar .m-logo {
+        display: flex; align-items: center; gap: 9px;
+      }
+      .mobile-topbar .m-logo-icon {
+        width: 32px; height: 32px;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        border-radius: 9px;
+        display: flex; align-items: center; justify-content: center;
+        font-family: 'DM Mono', monospace; font-size: .65rem; color: white;
+      }
+      .mobile-topbar .m-logo-name { font-size: .92rem; font-weight: 800; color: white; }
+      .mobile-topbar .m-logo-name span { color: var(--teal); }
+      .btn-hamburger {
+        background: rgba(255,255,255,.1);
+        border: none; color: white;
+        width: 36px; height: 36px;
+        border-radius: 9px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+      }
+
+      /* Drawer latéral (sidebar complète sur mobile) */
+      .mobile-drawer {
+        position: fixed;
+        top: 0; left: -100%; bottom: 0;
+        width: 280px;
+        background: linear-gradient(170deg, var(--navy) 0%, #162340 100%);
+        z-index: 300;
+        display: flex !important;
+        flex-direction: column;
+        transition: left .28s cubic-bezier(.4,0,.2,1);
+        box-shadow: 4px 0 24px rgba(30,45,78,.3);
+        overflow-y: auto;
+      }
+      .mobile-drawer.open { left: 0; }
+      .drawer-overlay {
+        display: none;
+        position: fixed; inset: 0;
+        background: rgba(0,0,0,.45);
+        z-index: 299;
+      }
+      .drawer-overlay.open { display: block; }
+      .drawer-close {
+        position: absolute; top: 12px; right: 12px;
+        background: rgba(255,255,255,.1); border: none; color: white;
+        width: 32px; height: 32px; border-radius: 8px;
+        font-size: 1rem; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+      }
+
+      /* Content area : prend tout l'espace restant */
+      .content-area {
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* Pages : scroll, padding réduit, espace bottom nav */
+      .page {
+        padding: 16px 14px 80px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      /* Topbar page → plus compact */
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+      .topbar h1 { font-size: 1.35rem; }
+      .date-badge { font-size: .74rem; padding: 7px 12px; align-self: flex-start; }
+
+      /* Stats → colonne unique sur très petit écran */
+      .stats-row { grid-template-columns: 1fr; gap: 10px; margin-bottom: 18px; }
+      .stat-card { padding: 16px 18px; display: flex; align-items: center; gap: 16px; }
+      .stat-card .stat-label { margin-bottom: 0; font-size: .68rem; }
+      .stat-card .stat-value { font-size: 1.5rem; }
+
+      /* CRM cards → colonne */
+      .crm-grid { grid-template-columns: 1fr; gap: 14px; margin-bottom: 20px; }
+      .crm-card { padding: 20px 18px; }
+
+      /* Solutions list */
+      .solution-row { flex-wrap: wrap; gap: 12px; padding: 14px 16px; }
+
+      /* Support */
+      .support-grid { grid-template-columns: 1fr; gap: 12px; }
+      .form-row { grid-template-columns: 1fr; }
+      .settings-card { padding: 18px 16px; }
+
+      /* Configurateur nouveau CRM */
+      .setup-wrap { grid-template-columns: 1fr; }
+      .setup-nav-box { display: none; } /* remplacé par un select en haut */
+      .setup-mobile-nav {
+        display: flex !important;
+        gap: 8px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 4px;
+        margin-bottom: 12px;
+        scrollbar-width: none;
+      }
+      .setup-mobile-nav::-webkit-scrollbar { display: none; }
+      .setup-mn-btn {
+        flex-shrink: 0;
+        padding: 6px 12px;
+        border-radius: 20px;
+        border: 1.5px solid #dde3ee;
+        background: white;
+        color: var(--gray);
+        font-family: 'Outfit', sans-serif;
+        font-size: .74rem;
+        font-weight: 600;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all .15s;
+      }
+      .setup-mn-btn.active {
+        background: var(--teal);
+        border-color: var(--teal);
+        color: white;
+      }
+      .setup-fg2 { grid-template-columns: 1fr; }
+      .setup-fg3 { grid-template-columns: 1fr; }
+      .setup-status-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .setup-section-body > div[style*="grid-template-columns:1fr 1fr"] {
+        display: flex !important; flex-direction: column !important; gap: 12px !important;
+      }
+
+      /* Overlay CRM */
+      .crm-overlay-bar { flex-wrap: wrap; height: auto; padding: 8px 12px; gap: 8px; }
+      .crm-overlay-bar .crm-url { display: none; }
+      .crm-overlay-bar .open-new { font-size: .75rem; padding: 5px 10px; }
+
+      /* Page setup topbar */
+      #page-nouveau-crm .topbar { flex-direction: row; align-items: center; flex-wrap: wrap; }
+      #page-nouveau-crm .topbar h1 { font-size: 1.1rem; }
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE — PETIT MOBILE (≤ 420px)
+    ═══════════════════════════════════════ */
+    @media (max-width: 420px) {
+      .page { padding: 12px 10px 76px; }
+      .topbar h1 { font-size: 1.2rem; }
+      .stat-card .stat-value { font-size: 1.3rem; }
+      .crm-card { padding: 16px 14px; }
+      .crm-name { font-size: 1.05rem; }
+      .setup-section-body { padding: .85rem .9rem; }
+      .setup-fi { font-size: .8rem; padding: 7px 9px; }
+    }
+
+    /* Bottom nav cachée par défaut sur desktop */
+    .bottom-nav { display: none; }
+    .mobile-topbar { display: none; }
+    .mobile-drawer { display: none !important; }
+    .setup-mobile-nav { display: none; }
   </style>
 </head>
 <body>
 
 <!-- LOADER -->
 <div class="page-loader" id="pageLoader"><div class="spin"></div></div>
+
+<!-- TOPBAR MOBILE (visible ≤768px) -->
+<div class="mobile-topbar">
+  <div class="m-logo">
+    <div class="m-logo-icon">&lt;/&gt;</div>
+    <div class="m-logo-name">LOAC <span>DEV</span></div>
+  </div>
+  <button class="btn-hamburger" onclick="openDrawer()">☰</button>
+</div>
+
+<!-- OVERLAY drawer -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER SIDEBAR MOBILE -->
+<div class="mobile-drawer" id="mobileDrawer">
+  <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  <div class="sidebar-logo" style="padding:20px 20px 16px;margin-top:8px">
+    <div class="logo-row">
+      <div class="logo-icon">&lt;/&gt;</div>
+      <div class="logo-text">
+        <div class="name">LOAC <span>DEV</span></div>
+        <div class="sub">Solutions</div>
+      </div>
+    </div>
+  </div>
+  <nav style="flex:1;padding:12px">
+    <div class="nav-label">Menu</div>
+    <button class="nav-item" onclick="showPage('dashboard',null);closeDrawer()"><span class="icon">🏠</span> Tableau de bord</button>
+    <button class="nav-item" onclick="showPage('solutions',null);closeDrawer()"><span class="icon">📦</span> Mes solutions</button>
+    <div class="nav-label">CRM</div>
+    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/','Biontruffe',null);closeDrawer()"><span class="icon">🌿</span> Biontruffe<span class="ext-badge">EXT</span></button>
+    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/MDM-BDC26/','MDM BDC 26',null);closeDrawer()"><span class="icon">🌾</span> MDM BDC 26<span class="ext-badge">EXT</span></button>
+    <div class="nav-label">Compte</div>
+    <button class="nav-item" onclick="showPage('nouveau-crm',null);closeDrawer()"><span class="icon">⚙️</span> Nouveau client CRM</button>
+    <button class="nav-item" onclick="showPage('parametres',null);closeDrawer()"><span class="icon">🔧</span> Paramètres</button>
+    <button class="nav-item" onclick="showPage('support',null);closeDrawer()"><span class="icon">📞</span> Support</button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="user-avatar" id="avatarInitialDrawer">?</div>
+      <div class="user-info"><div class="uname" id="userDisplayNameDrawer">…</div><div class="urole">Administrateur</div></div>
+      <button class="btn-logout" onclick="logout()" title="Déconnexion">⏻</button>
+    </div>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
@@ -561,7 +846,7 @@
   </div>
 
   <!-- ── PAGE : NOUVEAU CLIENT CRM ── -->
-  <div class="page" id="page-nouveau-crm" style="padding:28px 36px">
+  <div class="page" id="page-nouveau-crm">
     <div class="topbar">
       <div>
         <h1>Nouveau client CRM</h1>
@@ -570,9 +855,20 @@
       <button class="setup-btn setup-btn-teal" onclick="setupTelechargerConfig()">⬇️ Télécharger config.js</button>
     </div>
 
+    <!-- NAVIGATION MOBILE (pills horizontaux, visible ≤768px) -->
+    <div class="setup-mobile-nav">
+      <button class="setup-mn-btn active" onclick="setupMobileGoSec('ss-societe',this)">🏢 Société</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-theme',this)">🎨 Apparence</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-supabase',this)">🗄️ Supabase</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-catalogue',this)">📦 Catalogue</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-profils',this)">👥 Profils</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-conditions',this)">📜 Conditions</button>
+      <button class="setup-mn-btn" onclick="setupMobileGoSec('ss-deploy',this);setupGenConfig()">🚀 Déploiement</button>
+    </div>
+
     <div class="setup-wrap">
 
-      <!-- NAV STICKY -->
+      <!-- NAV STICKY (desktop) -->
       <aside>
         <div class="setup-nav-box">
           <div class="setup-nav-top">Sections</div>
@@ -906,6 +1202,48 @@
     window.location.href = 'index.html';
   }
 
+  // ── MOBILE NAV ──
+  function openDrawer() {
+    document.getElementById('mobileDrawer').classList.add('open');
+    document.getElementById('drawerOverlay').classList.add('open');
+  }
+  function closeDrawer() {
+    document.getElementById('mobileDrawer').classList.remove('open');
+    document.getElementById('drawerOverlay').classList.remove('open');
+  }
+
+  // Sync drawer user info
+  sb.auth.getSession().then(({ data }) => {
+    if (!data.session) return;
+    const email = data.session.user.email || '';
+    const name  = email.split('@')[0];
+    const initial = name[0]?.toUpperCase() || '?';
+    const el1 = document.getElementById('avatarInitialDrawer');
+    const el2 = document.getElementById('userDisplayNameDrawer');
+    if(el1) el1.textContent = initial;
+    if(el2) el2.textContent = email;
+  });
+
+  // Override showPage pour mettre à jour la bottom nav
+  const _origShowPage = showPage;
+  const bnMap = {
+    'dashboard':    'bn-home',
+    'solutions':    'bn-sol',
+    'nouveau-crm':  'bn-new',
+    'parametres':   'bn-param',
+    'support':      'bn-supp'
+  };
+  function showPage(id, btn) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('page-' + id)?.classList.add('active');
+    if (btn) btn.classList.add('active');
+    // Mettre à jour bottom nav
+    document.querySelectorAll('.bn-item').forEach(b => b.classList.remove('active'));
+    const bnId = bnMap[id];
+    if (bnId) document.getElementById(bnId)?.classList.add('active');
+  }
+
   /* ════════════════════════════════════════
      CONFIGURATEUR NOUVEAU CLIENT CRM
   ════════════════════════════════════════ */
@@ -1115,6 +1453,37 @@ create policy "public_all" on commandes for all using (true) with check (true); 
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='config-'+nom+'.js'; a.click();
   }
 
+  // ── SETUP MOBILE NAV (scroll horizontal de pills) ──
+  function setupMobileGoSec(id, btn) {
+    // Sur mobile, les boutons pills scrollent vers la section
+    document.querySelectorAll('.setup-mn-btn').forEach(b => b.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    const el = document.getElementById(id);
+    if(el) {
+      if(el.classList.contains('collapsed')) el.classList.remove('collapsed');
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
 </script>
+
+<!-- BOTTOM NAV (visible ≤768px) -->
+<nav class="bottom-nav">
+  <button class="bn-item active" id="bn-home" onclick="showPage('dashboard',null)">
+    <span class="bn-icon">🏠</span>Dashboard
+  </button>
+  <button class="bn-item" id="bn-sol" onclick="showPage('solutions',null)">
+    <span class="bn-icon">📦</span>Solutions
+  </button>
+  <button class="bn-item" id="bn-new" onclick="showPage('nouveau-crm',null)">
+    <span class="bn-icon">⚙️</span>Nouveau CRM
+  </button>
+  <button class="bn-item" id="bn-param" onclick="showPage('parametres',null)">
+    <span class="bn-icon">🔧</span>Paramètres
+  </button>
+  <button class="bn-item" id="bn-supp" onclick="showPage('support',null)">
+    <span class="bn-icon">📞</span>Support
+  </button>
+</nav>
 </body>
 </html>
