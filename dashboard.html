@@ -85,7 +85,7 @@
     .section-title { font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 16px; }
 
     /* CRM GRID */
-    .crm-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; margin-bottom: 32px; }
+    .crm-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 32px; }
     .crm-card { background: var(--white); border-radius: 20px; padding: 28px 28px 24px; box-shadow: 0 4px 20px rgba(30,45,78,.09); position: relative; overflow: hidden; display: flex; flex-direction: column; }
     .crm-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
     .crm-card.biontruf::before { background: linear-gradient(90deg, #2BB5A0, #3EC6C6); }
@@ -272,7 +272,7 @@
       .sidebar { width: 220px; }
       .page { padding: 24px 20px; }
       .stats-row { grid-template-columns: repeat(3,1fr); gap: 12px; }
-      .crm-grid { grid-template-columns: 1fr; gap: 16px; }
+      .crm-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
       .support-grid { grid-template-columns: 1fr; }
       .form-row { grid-template-columns: 1fr; }
       .setup-wrap { grid-template-columns: 190px 1fr; gap: 14px; }
@@ -542,6 +542,7 @@
     <div class="nav-label">CRM</div>
     <button class="nav-item" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/','Biontruffe',null);closeDrawer()"><span class="icon">🌿</span> Biontruffe<span class="ext-badge">EXT</span></button>
     <button class="nav-item" onclick="openCRM('MDM2026_CRM_Firebase.html','MDM CRM 2026',null);closeDrawer()"><span class="icon">🌾</span> MDM CRM 2026</button>
+    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/V3mdm/','MDM V3 Firebase',null);closeDrawer()"><span class="icon">🌿</span> MDM V3 Firebase<span class="ext-badge">EXT</span></button>
     <div class="nav-label">Compte</div>
     <button class="nav-item" onclick="showPage('nouveau-crm',null);closeDrawer()"><span class="icon">⚙️</span> Nouveau client CRM</button>
     <button class="nav-item" onclick="showPage('parametres',null);closeDrawer()"><span class="icon">🔧</span> Paramètres</button>
@@ -585,6 +586,10 @@
     <button class="nav-item" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', this)">
       <span class="icon">🌾</span> MDM CRM 2026
     </button>
+    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', this)">
+      <span class="icon">🌿</span> MDM V3 Firebase
+      <span class="ext-badge">EXT</span>
+    </button>
 
     <div class="nav-label">Compte</div>
     <button class="nav-item" onclick="showPage('nouveau-crm', this)">
@@ -626,8 +631,8 @@
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-label">Solutions actives</div>
-        <div class="stat-value">2</div>
-        <div class="stat-sub">Biontruffe · MDM CRM 2026</div>
+        <div class="stat-value">3</div>
+        <div class="stat-sub">Biontruffe · MDM CRM · MDM V3</div>
       </div>
       <div class="stat-card">
         <div class="stat-label">Clients pilotes</div>
@@ -681,6 +686,25 @@
         </div>
         <div>
           <button class="crm-action" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', null)">Accéder →</button>
+        </div>
+      </div>
+      <div class="crm-card mdm" style="border-top:4px solid transparent;border-image:linear-gradient(90deg,#059669,#3b82f6) 1;">
+        <div class="crm-card-bg" style="background:#059669;"></div>
+        <div class="crm-icon" style="background:linear-gradient(135deg,rgba(5,150,105,.15),rgba(59,130,246,.15));">🌿</div>
+        <div class="crm-name">MDM V3 Firebase</div>
+        <div class="crm-desc">Version déployée du CRM MDM 2026 — accès direct via GitHub Pages. Interface claire, import PDF/Excel, BDC complet, Firebase intégré.</div>
+        <div class="crm-tags">
+          <span class="tag green">En ligne</span>
+          <span class="tag teal">V3mdm</span>
+          <span class="tag blue">GitHub Pages</span>
+        </div>
+        <div class="crm-meta">
+          <div class="crm-meta-item"><strong>Firebase</strong>bdcmdm26</div>
+          <div class="crm-meta-item"><strong>v3.0</strong>Version</div>
+          <div class="crm-meta-item"><strong>En ligne</strong>Statut</div>
+        </div>
+        <div>
+          <button class="crm-action" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', null)">Accéder →</button>
         </div>
       </div>
     </div>
@@ -744,6 +768,15 @@
         </div>
         <span class="sol-status">● Actif</span>
         <button class="btn-open" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', null)">Ouvrir →</button>
+      </div>
+      <div class="solution-row mdm">
+        <div class="sol-icon">🌿</div>
+        <div class="sol-info">
+          <div class="sol-name">MDM V3 Firebase</div>
+          <div class="sol-url">loac1118.github.io/V3mdm/</div>
+        </div>
+        <span class="sol-status">● En ligne</span>
+        <button class="btn-open" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', null)" style="background:linear-gradient(135deg,#059669,#3b82f6);">Ouvrir →</button>
       </div>
     </div>
   </div>
@@ -833,6 +866,7 @@
             <option>Général (LOAC DEV)</option>
             <option>Biontruffe</option>
             <option>MDM CRM 2026</option>
+            <option>MDM V3 Firebase</option>
           </select>
         </div>
       </div>
