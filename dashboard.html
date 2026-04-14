@@ -6,6 +6,9 @@
   <title>LOAC DEV Solutions — Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Firebase pour persistance des CRM -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -264,6 +267,138 @@
 
     @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes spin   { to { transform: rotate(360deg); } }
+
+    /* ── PAGE : GÉRER MES CRM ── */
+    .manage-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+    .btn-add-crm {
+      display:inline-flex; align-items:center; gap:8px;
+      padding:11px 22px; border-radius:10px; border:none;
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+      color:#fff; font-family:'Outfit',sans-serif; font-size:.92rem; font-weight:700;
+      cursor:pointer; transition:opacity .2s, transform .15s;
+      box-shadow:0 4px 16px rgba(62,198,198,.3);
+    }
+    .btn-add-crm:hover { opacity:.88; transform:translateY(-1px); }
+
+    .crm-manage-list { display:flex; flex-direction:column; gap:12px; }
+    .crm-manage-row {
+      background:#fff; border-radius:14px;
+      padding:18px 22px; box-shadow:0 2px 12px rgba(30,45,78,.07);
+      display:flex; align-items:center; gap:16px;
+      border-left:4px solid var(--teal);
+      transition:box-shadow .2s;
+      position:relative;
+    }
+    .crm-manage-row:hover { box-shadow:0 4px 20px rgba(30,45,78,.12); }
+    .crm-manage-row.inactive { border-left-color:#dde3ee; opacity:.7; }
+    .crm-drag-handle {
+      color:#b0bac8; font-size:1.1rem; cursor:grab;
+      padding:4px; flex-shrink:0; user-select:none;
+    }
+    .crm-drag-handle:active { cursor:grabbing; }
+    .crm-manage-icon {
+      width:44px; height:44px; border-radius:12px;
+      background:linear-gradient(135deg,rgba(62,198,198,.15),rgba(46,95,163,.15));
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.3rem; flex-shrink:0;
+    }
+    .crm-manage-info { flex:1; min-width:0; }
+    .crm-manage-name { font-size:.98rem; font-weight:700; color:var(--navy); margin-bottom:3px; }
+    .crm-manage-url  { font-size:.76rem; color:var(--gray); font-family:'DM Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .crm-manage-desc { font-size:.78rem; color:var(--gray); margin-top:2px; }
+    .crm-manage-tags { display:flex; gap:5px; margin-top:6px; flex-wrap:wrap; }
+    .crm-badge-ext  { background:rgba(62,198,198,.12); color:#1da8a8; }
+    .crm-badge-local { background:rgba(46,95,163,.12); color:var(--blue); }
+    .crm-manage-actions { display:flex; align-items:center; gap:8px; flex-shrink:0; }
+    .toggle-switch {
+      position:relative; width:44px; height:24px;
+      cursor:pointer; flex-shrink:0;
+    }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-slider {
+      position:absolute; inset:0;
+      background:#dde3ee; border-radius:24px;
+      transition:background .2s;
+    }
+    .toggle-slider::before {
+      content:''; position:absolute;
+      width:18px; height:18px; border-radius:50%;
+      background:#fff; left:3px; top:3px;
+      transition:transform .2s;
+      box-shadow:0 1px 4px rgba(0,0,0,.2);
+    }
+    .toggle-switch input:checked + .toggle-slider { background:var(--teal); }
+    .toggle-switch input:checked + .toggle-slider::before { transform:translateX(20px); }
+    .btn-edit-crm {
+      background:none; border:1.5px solid #dde3ee; color:var(--gray);
+      width:34px; height:34px; border-radius:9px;
+      font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; flex-shrink:0;
+    }
+    .btn-edit-crm:hover { border-color:var(--teal); color:var(--teal); }
+    .btn-del-crm {
+      background:none; border:1.5px solid #fcc; color:#c0392b;
+      width:34px; height:34px; border-radius:9px;
+      font-size:.9rem; cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; flex-shrink:0;
+    }
+    .btn-del-crm:hover { background:#fff0f0; }
+
+    /* Modal ajout/édition CRM */
+    .crm-modal-overlay {
+      position:fixed; inset:0; background:rgba(14,28,53,.55);
+      backdrop-filter:blur(4px); z-index:999;
+      display:none; align-items:center; justify-content:center;
+    }
+    .crm-modal-overlay.open { display:flex; }
+    .crm-modal {
+      background:#fff; border-radius:20px; padding:32px 36px;
+      width:100%; max-width:500px;
+      box-shadow:0 24px 64px rgba(14,28,53,.25);
+      animation:fadeUp .3s ease;
+    }
+    .crm-modal h3 { font-size:1.25rem; font-weight:700; color:var(--navy); margin-bottom:22px; }
+    .crm-form-group { margin-bottom:16px; }
+    .crm-form-group label {
+      display:block; font-size:.75rem; font-weight:600;
+      letter-spacing:1px; text-transform:uppercase;
+      color:var(--navy); margin-bottom:7px;
+    }
+    .crm-form-group input, .crm-form-group select, .crm-form-group textarea {
+      width:100%; padding:12px 16px;
+      border:1.5px solid #dde3ee; border-radius:10px;
+      font-family:'Outfit',sans-serif; font-size:.92rem; color:var(--navy);
+      background:var(--light); outline:none; transition:border-color .2s;
+    }
+    .crm-form-group input:focus, .crm-form-group select:focus, .crm-form-group textarea:focus {
+      border-color:var(--teal); box-shadow:0 0 0 3px rgba(62,198,198,.1);
+    }
+    .crm-form-group textarea { resize:vertical; min-height:70px; }
+    .crm-form-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .crm-modal-foot { display:flex; gap:12px; margin-top:24px; justify-content:flex-end; }
+    .btn-crm-cancel {
+      padding:11px 22px; border-radius:10px;
+      border:1.5px solid #dde3ee; background:none;
+      font-family:'Outfit',sans-serif; font-size:.9rem; font-weight:600;
+      color:var(--gray); cursor:pointer;
+    }
+    .btn-crm-save {
+      padding:11px 24px; border-radius:10px; border:none;
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+      color:#fff; font-family:'Outfit',sans-serif;
+      font-size:.9rem; font-weight:700; cursor:pointer;
+      transition:opacity .2s;
+    }
+    .btn-crm-save:hover { opacity:.87; }
+    .crm-empty-state {
+      text-align:center; padding:48px 24px;
+      background:#fff; border-radius:16px;
+      box-shadow:0 2px 12px rgba(30,45,78,.07);
+    }
+    .crm-empty-icon { font-size:2.5rem; margin-bottom:12px; }
+    .crm-empty-title { font-size:1rem; font-weight:700; color:var(--navy); margin-bottom:6px; }
+    .crm-empty-sub { font-size:.85rem; color:var(--gray); }
+    .drag-over { box-shadow:0 0 0 2px var(--teal) !important; background:rgba(62,198,198,.04) !important; }
 
     /* ═══════════════════════════════════════
        RESPONSIVE — TABLETTE (≤ 1024px)
@@ -540,10 +675,9 @@
     <button class="nav-item" onclick="showPage('dashboard',null);closeDrawer()"><span class="icon">🏠</span> Tableau de bord</button>
     <button class="nav-item" onclick="showPage('solutions',null);closeDrawer()"><span class="icon">📦</span> Mes solutions</button>
     <div class="nav-label">CRM</div>
-    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/','Biontruffe',null);closeDrawer()"><span class="icon">🌿</span> Biontruffe<span class="ext-badge">EXT</span></button>
-    <button class="nav-item" onclick="openCRM('MDM2026_CRM_Firebase.html','MDM CRM 2026',null);closeDrawer()"><span class="icon">🌾</span> MDM CRM 2026</button>
-    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/V3mdm/','MDM V3 Firebase',null);closeDrawer()"><span class="icon">🌿</span> MDM V3 Firebase<span class="ext-badge">EXT</span></button>
+    <div id="drawer-crm-nav"></div>
     <div class="nav-label">Compte</div>
+    <button class="nav-item" onclick="showPage('gerer-crm',null);closeDrawer()"><span class="icon">🔗</span> Gérer mes CRM</button>
     <button class="nav-item" onclick="showPage('nouveau-crm',null);closeDrawer()"><span class="icon">⚙️</span> Nouveau client CRM</button>
     <button class="nav-item" onclick="showPage('parametres',null);closeDrawer()"><span class="icon">🔧</span> Paramètres</button>
     <button class="nav-item" onclick="showPage('support',null);closeDrawer()"><span class="icon">📞</span> Support</button>
@@ -579,19 +713,12 @@
     </button>
 
     <div class="nav-label">CRM</div>
-    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/', 'Biontruffe', this)">
-      <span class="icon">🌿</span> Biontruffe
-      <span class="ext-badge">EXT</span>
-    </button>
-    <button class="nav-item" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', this)">
-      <span class="icon">🌾</span> MDM CRM 2026
-    </button>
-    <button class="nav-item" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', this)">
-      <span class="icon">🌿</span> MDM V3 Firebase
-      <span class="ext-badge">EXT</span>
-    </button>
+    <div id="sidebar-crm-nav"></div>
 
     <div class="nav-label">Compte</div>
+    <button class="nav-item" onclick="showPage('gerer-crm', this)">
+      <span class="icon">🔗</span> Gérer mes CRM
+    </button>
     <button class="nav-item" onclick="showPage('nouveau-crm', this)">
       <span class="icon">⚙️</span> Nouveau client CRM
     </button>
@@ -647,67 +774,7 @@
     </div>
 
     <div class="section-title">Mes solutions CRM</div>
-    <div class="crm-grid">
-      <div class="crm-card biontruf">
-        <div class="crm-card-bg"></div>
-        <div class="crm-icon">🌿</div>
-        <div class="crm-name">Biontruffe</div>
-        <div class="crm-desc">CRM dédié à la filière truffe biologique. Gestion des producteurs, revendeurs, bons de commande et suivi des livraisons.</div>
-        <div class="crm-tags">
-          <span class="tag green">Bio & Terroir</span>
-          <span class="tag teal">Bon de commande</span>
-          <span class="tag green">Revendeurs</span>
-        </div>
-        <div class="crm-meta">
-          <div class="crm-meta-item"><strong>Actif</strong>Statut</div>
-          <div class="crm-meta-item"><strong>v1.2</strong>Version</div>
-          <div class="crm-meta-item"><strong>GitHub Pages</strong>Hébergement</div>
-        </div>
-        <div>
-          <button class="crm-action" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/', 'Biontruffe', null)">Accéder →</button>
-        </div>
-      </div>
-
-      <div class="crm-card mdm">
-        <div class="crm-card-bg"></div>
-        <div class="crm-icon">🌾</div>
-        <div class="crm-name">MDM CRM 2026</div>
-        <div class="crm-desc">CRM complet pour le Moulin des Moines : 1 200+ produits bio, gestion prospects &amp; clients, bon de commande avec import PDF/Excel, suivi des commandes Firebase.</div>
-        <div class="crm-tags">
-          <span class="tag blue">CRM Firebase</span>
-          <span class="tag teal">1200+ produits bio</span>
-          <span class="tag blue">Import PDF/Excel</span>
-          <span class="tag green">Prospects &amp; Clients</span>
-        </div>
-        <div class="crm-meta">
-          <div class="crm-meta-item"><strong>Firebase</strong>bdcmdm26</div>
-          <div class="crm-meta-item"><strong>v3.0</strong>Version</div>
-          <div class="crm-meta-item"><strong>LOAC DEV</strong>Hébergement</div>
-        </div>
-        <div>
-          <button class="crm-action" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', null)">Accéder →</button>
-        </div>
-      </div>
-      <div class="crm-card mdm" style="border-top:4px solid transparent;border-image:linear-gradient(90deg,#059669,#3b82f6) 1;">
-        <div class="crm-card-bg" style="background:#059669;"></div>
-        <div class="crm-icon" style="background:linear-gradient(135deg,rgba(5,150,105,.15),rgba(59,130,246,.15));">🌿</div>
-        <div class="crm-name">MDM V3 Firebase</div>
-        <div class="crm-desc">Version déployée du CRM MDM 2026 — accès direct via GitHub Pages. Interface claire, import PDF/Excel, BDC complet, Firebase intégré.</div>
-        <div class="crm-tags">
-          <span class="tag green">En ligne</span>
-          <span class="tag teal">V3mdm</span>
-          <span class="tag blue">GitHub Pages</span>
-        </div>
-        <div class="crm-meta">
-          <div class="crm-meta-item"><strong>Firebase</strong>bdcmdm26</div>
-          <div class="crm-meta-item"><strong>v3.0</strong>Version</div>
-          <div class="crm-meta-item"><strong>En ligne</strong>Statut</div>
-        </div>
-        <div>
-          <button class="crm-action" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', null)">Accéder →</button>
-        </div>
-      </div>
-    </div>
+    <div class="crm-grid" id="crm-dashboard-grid"></div>
 
     <div class="section-title">Activité récente</div>
     <div class="activity-card">
@@ -750,35 +817,7 @@
         <p>Accédez à vos CRM déployés</p>
       </div>
     </div>
-    <div class="solutions-list">
-      <div class="solution-row bio">
-        <div class="sol-icon">🌿</div>
-        <div class="sol-info">
-          <div class="sol-name">Biontruffe</div>
-          <div class="sol-url">loac1118.github.io/BIONTRUFFE/</div>
-        </div>
-        <span class="sol-status">● Actif</span>
-        <button class="btn-open" onclick="openCRM('https://loac1118.github.io/BIONTRUFFE/', 'Biontruffe', null)">Ouvrir →</button>
-      </div>
-      <div class="solution-row mdm">
-        <div class="sol-icon">🌾</div>
-        <div class="sol-info">
-          <div class="sol-name">MDM CRM 2026</div>
-          <div class="sol-url">Moulin des Moines — Firebase CRM</div>
-        </div>
-        <span class="sol-status">● Actif</span>
-        <button class="btn-open" onclick="openCRM('MDM2026_CRM_Firebase.html', 'MDM CRM 2026', null)">Ouvrir →</button>
-      </div>
-      <div class="solution-row mdm">
-        <div class="sol-icon">🌿</div>
-        <div class="sol-info">
-          <div class="sol-name">MDM V3 Firebase</div>
-          <div class="sol-url">loac1118.github.io/V3mdm/</div>
-        </div>
-        <span class="sol-status">● En ligne</span>
-        <button class="btn-open" onclick="openCRM('https://loac1118.github.io/V3mdm/', 'MDM V3 Firebase', null)" style="background:linear-gradient(135deg,#059669,#3b82f6);">Ouvrir →</button>
-      </div>
-    </div>
+    <div class="solutions-list" id="crm-solutions-list"></div>
   </div>
 
   <!-- ── PAGE : PARAMÈTRES ── -->
@@ -876,6 +915,28 @@
       </div>
       <div class="alert-inline" id="supportAlert"></div>
       <button class="btn-submit" onclick="sendSupport()">Envoyer le message →</button>
+    </div>
+  </div>
+
+  <!-- ── PAGE : GÉRER MES CRM ── -->
+  <div class="page" id="page-gerer-crm">
+    <div class="topbar">
+      <div>
+        <h1>Gérer mes CRM</h1>
+        <p>Données persistées dans Supabase — synchronisées sur tous vos appareils</p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button onclick="crmCopySQL()" style="padding:10px 16px;border-radius:10px;border:1.5px solid #dde3ee;background:#fff;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:600;color:var(--gray);cursor:pointer;" title="Copier le SQL pour créer la table Supabase">📋 SQL table</button>
+        <button class="btn-add-crm" onclick="crmOpenModal()">+ Ajouter un CRM</button>
+      </div>
+    </div>
+    <div class="crm-manage-list" id="crmManageList">
+      <!-- Rendu dynamique par JS -->
+    </div>
+    <div class="crm-empty-state" id="crmEmptyState" style="display:none;">
+      <div class="crm-empty-icon">🔗</div>
+      <div class="crm-empty-title">Aucun CRM configuré</div>
+      <div class="crm-empty-sub">Cliquez sur "+ Ajouter un CRM" pour commencer.</div>
     </div>
   </div>
 
@@ -1487,7 +1548,421 @@ create policy "public_all" on commandes for all using (true) with check (true); 
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='config-'+nom+'.js'; a.click();
   }
 
+  /* ════════════════════════════════════════════════════
+     GESTION DYNAMIQUE DES CRM
+     Stockage : Firebase Firestore (projet loacdev-c5e9b)
+     Collection : loac_crms
+  ════════════════════════════════════════════════════ */
+
+  // ── Config Firebase (projet LOAC DEV dédié)
+  const FB_CONFIG = {
+    apiKey:            "AIzaSyD2ZeNj1p5HONQAYK1aaOvR7XgVp39hqZk",
+    authDomain:        "loacdev-c5e9b.firebaseapp.com",
+    projectId:         "loacdev-c5e9b",
+    storageBucket:     "loacdev-c5e9b.firebasestorage.app",
+    messagingSenderId: "4400514748",
+    appId:             "1:4400514748:web:2c096d74d3eead9cf432b9"
+  };
+
+  // Init Firebase (éviter double init)
+  let fbApp, fbDb;
+  function initFb() {
+    if (fbDb) return fbDb;
+    try {
+      fbApp = firebase.apps.length
+        ? firebase.app()
+        : firebase.initializeApp(FB_CONFIG);
+      fbDb = firebase.firestore(fbApp);
+    } catch(e) {
+      console.error('Firebase init error', e);
+    }
+    return fbDb;
+  }
+
+  // ── CRM par défaut (insérés si collection vide)
+  const CRM_DEFAULTS = [
+    {
+      id: 'bio1', name: 'Biontruffe', icon: '🌿',
+      url: 'https://loac1118.github.io/BIONTRUFFE/',
+      desc: 'CRM dédié à la filière truffe biologique. Gestion des producteurs, revendeurs, bons de commande et suivi des livraisons.',
+      color: '#2BB5A0', type: 'ext',
+      tags: ['Bio & Terroir', 'Bon de commande', 'Revendeurs'],
+      active: true, position: 0
+    },
+    {
+      id: 'mdm1', name: 'MDM CRM 2026', icon: '🌾',
+      url: 'MDM2026_CRM_Firebase.html',
+      desc: 'CRM complet Moulin des Moines : 1 200+ produits bio, gestion prospects & clients, bon de commande avec import PDF/Excel.',
+      color: '#2E5FA3', type: 'local',
+      tags: ['CRM Firebase', '1200+ produits bio', 'Import PDF/Excel'],
+      active: true, position: 1
+    },
+    {
+      id: 'mdm2', name: 'MDM V3 Firebase', icon: '🌿',
+      url: 'https://loac1118.github.io/V3mdm/',
+      desc: 'Version déployée du CRM MDM 2026 — accès direct via GitHub Pages.',
+      color: '#059669', type: 'ext',
+      tags: ['En ligne', 'V3mdm', 'GitHub Pages'],
+      active: true, position: 2
+    }
+  ];
+
+  // Cache local
+  let crmCache = null;
+
+  // ── Charger depuis Firestore
+  async function crmLoad() {
+    if (crmCache) return crmCache;
+    const db = initFb();
+    try {
+      const snap = await db.collection('loac_crms').orderBy('position').get();
+      if (snap.empty) {
+        await crmInsertDefaults();
+        crmCache = [...CRM_DEFAULTS];
+        return crmCache;
+      }
+      crmCache = snap.docs.map(doc => {
+        const r = doc.data();
+        return {
+          id: doc.id,
+          name:   r.name   || '',
+          icon:   r.icon   || '🔗',
+          url:    r.url    || '',
+          desc:   r.desc   || '',
+          color:  r.color  || '#3EC6C6',
+          type:   r.type   || 'ext',
+          tags:   Array.isArray(r.tags) ? r.tags : [],
+          active: r.active !== false,
+          position: r.position || 0
+        };
+      });
+      return crmCache;
+    } catch(e) {
+      console.warn('Firestore CRM load error — fallback défauts', e);
+      crmCache = [...CRM_DEFAULTS];
+      return crmCache;
+    }
+  }
+
+  // ── Insérer les défauts dans Firestore
+  async function crmInsertDefaults() {
+    const db = initFb();
+    const batch = db.batch();
+    CRM_DEFAULTS.forEach(c => {
+      batch.set(db.collection('loac_crms').doc(c.id), {
+        name: c.name, icon: c.icon, url: c.url,
+        desc: c.desc, color: c.color, type: c.type,
+        tags: c.tags, active: c.active, position: c.position,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
+  }
+
+  // ── Sauvegarder un seul CRM (set/update)
+  async function crmSaveOne(crm, position) {
+    const db = initFb();
+    crmCache = null; // invalider cache
+    await db.collection('loac_crms').doc(crm.id).set({
+      name: crm.name, icon: crm.icon || '🔗', url: crm.url,
+      desc: crm.desc || '', color: crm.color || '#3EC6C6',
+      type: crm.type || 'ext', tags: crm.tags || [],
+      active: crm.active !== false,
+      position: position !== undefined ? position : (crm.position || 0),
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
+
+  // ── Sauvegarder toute la liste (batch pour les positions)
+  async function crmSaveAll(list) {
+    const db = initFb();
+    crmCache = list;
+    // Récupérer les IDs existants pour supprimer les absents
+    const existingSnap = await db.collection('loac_crms').get();
+    const existingIds  = existingSnap.docs.map(d => d.id);
+    const newIds       = list.map(c => c.id);
+    const toDelete     = existingIds.filter(id => !newIds.includes(id));
+
+    const batch = db.batch();
+    // Upsert tous
+    list.forEach((c, i) => {
+      batch.set(db.collection('loac_crms').doc(c.id), {
+        name: c.name, icon: c.icon || '🔗', url: c.url,
+        desc: c.desc || '', color: c.color || '#3EC6C6',
+        type: c.type || 'ext', tags: c.tags || [],
+        active: c.active !== false, position: i,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    });
+    // Supprimer les absents
+    toDelete.forEach(id => {
+      batch.delete(db.collection('loac_crms').doc(id));
+    });
+    await batch.commit();
+  }
+
+  // ── Supprimer un CRM
+  async function crmDeleteOne(id) {
+    const db = initFb();
+    crmCache = null;
+    await db.collection('loac_crms').doc(id).delete();
+  }
+
+  // ── Loader visuel
+  function crmShowLoading(show) {
+    const el = document.getElementById('crmManageList');
+    if (!el) return;
+    if (show) {
+      el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--gray);">' +
+        '<div style="width:28px;height:28px;border:3px solid rgba(62,198,198,.2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;"></div>' +
+        'Chargement depuis Firebase…</div>';
+    }
+  }
+
+  // ── Headers Supabase (conservé pour les autres fonctionnalités)
+  function crmSbHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    };
+  }
+
+  // ── Rendu complet
+  async function crmRenderAll() {
+    const list = await crmLoad();
+    crmRenderSidebar(list);
+    crmRenderDashboard(list);
+    crmRenderSolutions(list);
+    crmRenderManage(list);
+    const active = list.filter(c => c.active).length;
+    const statEl = document.querySelector('.stats-row .stat-card:first-child .stat-value');
+    if (statEl) statEl.textContent = active;
+    const subEl = document.querySelector('.stats-row .stat-card:first-child .stat-sub');
+    if (subEl) subEl.textContent = list.filter(c=>c.active).map(c=>c.name).join(' · ');
+  }
+
+  // ── Sidebar dynamique
+  function crmRenderSidebar(list) {
+    ['sidebar-crm-nav', 'drawer-crm-nav'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.innerHTML = list.filter(c => c.active).map(crm => `
+        <button class="nav-item" onclick="openCRM('${crm.url}', '${crm.name}', this)">
+          <span class="icon">${crm.icon}</span> ${crm.name}
+          ${crm.type === 'ext' ? '<span class="ext-badge">EXT</span>' : ''}
+        </button>`).join('');
+    });
+  }
+
+  // ── Grille dashboard
+  function crmRenderDashboard(list) {
+    const grid = document.getElementById('crm-dashboard-grid');
+    if (!grid) return;
+    grid.innerHTML = list.filter(c => c.active).map(crm => `
+      <div class="crm-card" style="border-top:4px solid ${crm.color};position:relative;overflow:hidden;">
+        <div style="position:absolute;top:-20px;right:-20px;width:110px;height:110px;border-radius:50%;background:${crm.color};opacity:.05;"></div>
+        <div class="crm-icon" style="background:${crm.color}22;width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:16px;">${crm.icon}</div>
+        <div class="crm-name">${crm.name}</div>
+        <div class="crm-desc">${crm.desc}</div>
+        <div class="crm-tags">${crm.tags.map(t=>`<span class="tag teal">${t}</span>`).join('')}</div>
+        <div class="crm-meta">
+          <div class="crm-meta-item"><strong>${crm.type==='ext'?'Externe':'Local'}</strong>Type</div>
+          <div class="crm-meta-item"><strong>Actif</strong>Statut</div>
+        </div>
+        <div>
+          <button class="crm-action" style="background:linear-gradient(135deg,${crm.color},${crm.color}cc);"
+            onclick="openCRM('${crm.url}','${crm.name}',null)">Accéder →</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── Page Mes solutions
+  function crmRenderSolutions(list) {
+    const el = document.getElementById('crm-solutions-list');
+    if (!el) return;
+    el.innerHTML = list.filter(c => c.active).map(crm => `
+      <div class="solution-row">
+        <div class="sol-icon" style="background:${crm.color}22;">${crm.icon}</div>
+        <div class="sol-info">
+          <div class="sol-name">${crm.name}</div>
+          <div class="sol-url">${crm.url}</div>
+        </div>
+        <span class="sol-status" style="color:${crm.color};">● Actif</span>
+        <button class="btn-open" style="background:linear-gradient(135deg,${crm.color},${crm.color}aa);"
+          onclick="openCRM('${crm.url}','${crm.name}',null)">Ouvrir →</button>
+      </div>`).join('')
+      || '<div style="text-align:center;padding:2rem;color:var(--gray);">Aucun CRM actif.</div>';
+  }
+
+  // ── Page Gérer mes CRM
+  function crmRenderManage(list) {
+    const el    = document.getElementById('crmManageList');
+    const empty = document.getElementById('crmEmptyState');
+    if (!el) return;
+    if (!list.length) { el.style.display='none'; if(empty) empty.style.display=''; return; }
+    el.style.display='flex'; if(empty) empty.style.display='none';
+    el.innerHTML = list.map((crm, i) => `
+      <div class="crm-manage-row ${crm.active?'':'inactive'}"
+           draggable="true" data-id="${crm.id}"
+           ondragstart="crmDragStart(event,${i})"
+           ondragover="crmDragOver(event)"
+           ondrop="crmDrop(event,${i})"
+           ondragleave="crmDragLeave(event)">
+        <span class="crm-drag-handle" title="Glisser pour réorganiser">⠿</span>
+        <div class="crm-manage-icon">${crm.icon}</div>
+        <div class="crm-manage-info">
+          <div class="crm-manage-name">${crm.name}</div>
+          <div class="crm-manage-url">${crm.url}</div>
+          <div class="crm-manage-desc">${crm.desc||'—'}</div>
+          <div class="crm-manage-tags">
+            ${crm.tags.map(t=>`<span class="tag teal" style="font-size:.62rem;">${t}</span>`).join('')}
+            <span class="tag ${crm.type==='ext'?'blue':'green'}" style="font-size:.62rem;">${crm.type==='ext'?'Externe':'Local'}</span>
+          </div>
+        </div>
+        <div class="crm-manage-actions">
+          <label class="toggle-switch" title="${crm.active?'Désactiver':'Activer'}">
+            <input type="checkbox" ${crm.active?'checked':''} onchange="crmToggle('${crm.id}',this.checked)"/>
+            <span class="toggle-slider"></span>
+          </label>
+          <button class="btn-edit-crm" onclick="crmOpenModal('${crm.id}')" title="Modifier">✏️</button>
+          <button class="btn-del-crm"  onclick="crmDelete('${crm.id}')"      title="Supprimer">🗑</button>
+        </div>
+      </div>`).join('');
+  }
+
+  // ── CRUD
+  async function crmToggle(id, active) {
+    const list = await crmLoad();
+    const crm  = list.find(c => c.id === id);
+    if (!crm) return;
+    crm.active = active;
+    crmCache = list;
+    await crmSaveOne(crm);
+    crmRenderAll();
+  }
+
+  async function crmDelete(id) {
+    const list = await crmLoad();
+    const crm  = list.find(c => c.id === id);
+    if (!crm) return;
+    if (!confirm('Supprimer "' + crm.name + '" ? Cette action est irréversible.')) return;
+    crmCache = list.filter(c => c.id !== id);
+    await crmDeleteOne(id);
+    crmRenderAll();
+  }
+
+  async function crmOpenModal(id) {
+    const overlay = document.getElementById('crmModalOverlay');
+    document.getElementById('crmEditId').value = id || '';
+    if (id) {
+      const list = await crmLoad();
+      const crm  = list.find(c => c.id === id);
+      if (!crm) return;
+      document.getElementById('crmModalTitle').textContent = 'Modifier le CRM';
+      document.getElementById('crmFieldName').value  = crm.name;
+      document.getElementById('crmFieldIcon').value  = crm.icon;
+      document.getElementById('crmFieldUrl').value   = crm.url;
+      document.getElementById('crmFieldDesc').value  = crm.desc || '';
+      document.getElementById('crmFieldColor').value = crm.color || '#3EC6C6';
+      document.getElementById('crmFieldType').value  = crm.type  || 'ext';
+      document.getElementById('crmFieldTags').value  = (crm.tags||[]).join(', ');
+    } else {
+      document.getElementById('crmModalTitle').textContent = 'Ajouter un CRM';
+      document.getElementById('crmFieldName').value  = '';
+      document.getElementById('crmFieldIcon').value  = '🔗';
+      document.getElementById('crmFieldUrl').value   = '';
+      document.getElementById('crmFieldDesc').value  = '';
+      document.getElementById('crmFieldColor').value = '#3EC6C6';
+      document.getElementById('crmFieldType').value  = 'ext';
+      document.getElementById('crmFieldTags').value  = '';
+    }
+    overlay.classList.add('open');
+    document.getElementById('crmFieldName').focus();
+  }
+
+  function crmCloseModal() {
+    document.getElementById('crmModalOverlay').classList.remove('open');
+  }
+
+  async function crmSave() {
+    const name = document.getElementById('crmFieldName').value.trim();
+    const url  = document.getElementById('crmFieldUrl').value.trim();
+    if (!name || !url) { alert('Nom et URL sont obligatoires.'); return; }
+
+    const btn = document.querySelector('.btn-crm-save');
+    btn.textContent = 'Enregistrement…'; btn.disabled = true;
+
+    const list   = await crmLoad();
+    const editId = document.getElementById('crmEditId').value;
+    const tags   = document.getElementById('crmFieldTags').value
+      .split(',').map(t=>t.trim()).filter(Boolean);
+
+    if (editId) {
+      const crm = list.find(c => c.id === editId);
+      if (crm) {
+        crm.name  = name;
+        crm.icon  = document.getElementById('crmFieldIcon').value  || '🔗';
+        crm.url   = url;
+        crm.desc  = document.getElementById('crmFieldDesc').value.trim();
+        crm.color = document.getElementById('crmFieldColor').value;
+        crm.type  = document.getElementById('crmFieldType').value;
+        crm.tags  = tags;
+        crmCache  = list;
+        await crmSaveOne(crm, list.indexOf(crm));
+      }
+    } else {
+      const newCrm = {
+        id: 'crm_' + Date.now(),
+        name, icon: document.getElementById('crmFieldIcon').value || '🔗',
+        url, desc: document.getElementById('crmFieldDesc').value.trim(),
+        color: document.getElementById('crmFieldColor').value,
+        type:  document.getElementById('crmFieldType').value,
+        tags,  active: true, position: list.length
+      };
+      list.push(newCrm);
+      crmCache = list;
+      await crmSaveOne(newCrm, newCrm.position);
+    }
+    btn.textContent = 'Enregistrer →'; btn.disabled = false;
+    crmRenderAll();
+    crmCloseModal();
+  }
+
+  // ── Drag & Drop
+  let dragIdx = null;
+  function crmDragStart(e, i) { dragIdx = i; e.dataTransfer.effectAllowed = 'move'; }
+  function crmDragOver(e)  { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+  function crmDragLeave(e) { e.currentTarget.classList.remove('drag-over'); }
+  async function crmDrop(e, targetIdx) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (dragIdx === null || dragIdx === targetIdx) return;
+    const list = await crmLoad();
+    const [moved] = list.splice(dragIdx, 1);
+    list.splice(targetIdx, 0, moved);
+    crmCache = list;
+    await crmSaveAll(list);
+    crmRenderAll();
+    dragIdx = null;
+  }
+
+  // ── Fermer avec Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') crmCloseModal();
+  });
+
+  // ── Init
+  window.addEventListener('DOMContentLoaded', () => {
+    // Firebase init différé (après chargement CDN)
+    setTimeout(() => {
+      crmShowLoading(true);
+      crmRenderAll();
+    }, 300);
+  });
+
   // ── SETUP MOBILE NAV (scroll horizontal de pills) ──
+  function setupMobileGoSec(id, btn) {  // ── SETUP MOBILE NAV (scroll horizontal de pills) ──
   function setupMobileGoSec(id, btn) {
     // Sur mobile, les boutons pills scrollent vers la section
     document.querySelectorAll('.setup-mn-btn').forEach(b => b.classList.remove('active'));
@@ -1500,6 +1975,53 @@ create policy "public_all" on commandes for all using (true) with check (true); 
   }
 
 </script>
+
+<!-- MODAL GÉRER CRM -->
+<div class="crm-modal-overlay" id="crmModalOverlay">
+  <div class="crm-modal">
+    <h3 id="crmModalTitle">Ajouter un CRM</h3>
+    <input type="hidden" id="crmEditId"/>
+    <div class="crm-form-row">
+      <div class="crm-form-group">
+        <label>Nom du CRM *</label>
+        <input type="text" id="crmFieldName" placeholder="Ex: MDM CRM 2026"/>
+      </div>
+      <div class="crm-form-group">
+        <label>Icône (emoji)</label>
+        <input type="text" id="crmFieldIcon" placeholder="🌾" maxlength="4"/>
+      </div>
+    </div>
+    <div class="crm-form-group">
+      <label>URL *</label>
+      <input type="url" id="crmFieldUrl" placeholder="https://... ou chemin relatif"/>
+    </div>
+    <div class="crm-form-group">
+      <label>Description</label>
+      <textarea id="crmFieldDesc" placeholder="Description courte du CRM…"></textarea>
+    </div>
+    <div class="crm-form-row">
+      <div class="crm-form-group">
+        <label>Couleur accent</label>
+        <input type="color" id="crmFieldColor" value="#3EC6C6"/>
+      </div>
+      <div class="crm-form-group">
+        <label>Type</label>
+        <select id="crmFieldType">
+          <option value="ext">Externe (autre domaine)</option>
+          <option value="local">Local (même repo)</option>
+        </select>
+      </div>
+    </div>
+    <div class="crm-form-group">
+      <label>Tags (séparés par des virgules)</label>
+      <input type="text" id="crmFieldTags" placeholder="Firebase, Bio, BDC…"/>
+    </div>
+    <div class="crm-modal-foot">
+      <button class="btn-crm-cancel" onclick="crmCloseModal()">Annuler</button>
+      <button class="btn-crm-save" onclick="crmSave()">Enregistrer →</button>
+    </div>
+  </div>
+</div>
 
 <!-- BOTTOM NAV (visible ≤768px) -->
 <nav class="bottom-nav">
