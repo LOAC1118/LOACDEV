@@ -1189,7 +1189,13 @@
   let currentUser = null;
 
   // Vérification session
+  // Timeout de sécurité : masque le loader après 5s quoi qu'il arrive
+  const _loaderTimeout = setTimeout(() => {
+    document.getElementById('pageLoader').classList.add('hidden');
+  }, 5000);
+
   sb.auth.getSession().then(({ data }) => {
+    clearTimeout(_loaderTimeout);
     if (!data.session) { window.location.href = 'index.html'; return; }
     currentUser = data.session.user;
     const email   = currentUser.email || '';
@@ -1202,6 +1208,10 @@
     document.getElementById('settingsEmail').textContent   = email;
     document.getElementById('settingsCreated').textContent = created;
     document.getElementById('pageLoader').classList.add('hidden');
+  }).catch(() => {
+    clearTimeout(_loaderTimeout);
+    document.getElementById('pageLoader').classList.add('hidden');
+    window.location.href = 'index.html';
   });
 
   sb.auth.onAuthStateChange((event) => {
@@ -1568,6 +1578,10 @@ create policy "public_all" on commandes for all using (true) with check (true); 
   let fbApp, fbDb;
   function initFb() {
     if (fbDb) return fbDb;
+    if (typeof firebase === 'undefined' || !firebase.firestore) {
+      console.warn('Firebase SDK non disponible');
+      return null;
+    }
     try {
       fbApp = firebase.apps.length
         ? firebase.app()
@@ -1575,6 +1589,7 @@ create policy "public_all" on commandes for all using (true) with check (true); 
       fbDb = firebase.firestore(fbApp);
     } catch(e) {
       console.error('Firebase init error', e);
+      return null;
     }
     return fbDb;
   }
@@ -1615,6 +1630,7 @@ create policy "public_all" on commandes for all using (true) with check (true); 
     if (crmCache) return crmCache;
     const db = initFb();
     try {
+      if (!db) throw new Error('Firebase non disponible');
       const snap = await db.collection('loac_crms').orderBy('position').get();
       if (snap.empty) {
         await crmInsertDefaults();
@@ -1711,12 +1727,10 @@ create policy "public_all" on commandes for all using (true) with check (true); 
   // ── Loader visuel
   function crmShowLoading(show) {
     const el = document.getElementById('crmManageList');
-    if (!el) return;
-    if (show) {
-      el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--gray);">' +
-        '<div style="width:28px;height:28px;border:3px solid rgba(62,198,198,.2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;"></div>' +
-        'Chargement depuis Firebase…</div>';
-    }
+    if (!el || !show) return;
+    el.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--gray);">' +
+      '<div style="width:28px;height:28px;border:3px solid rgba(62,198,198,.2);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px;"></div>' +
+      'Chargement depuis Firebase…</div>';
   }
 
   // ── Headers Supabase (conservé pour les autres fonctionnalités)
@@ -1952,13 +1966,25 @@ create policy "public_all" on commandes for all using (true) with check (true); 
     if (e.key === 'Escape') crmCloseModal();
   });
 
-  // ── Init
+  // ── Init Firebase : attendre que les CDN soient chargés
+  function waitForFirebase(callback, attempts) {
+    attempts = attempts || 0;
+    if (typeof firebase !== 'undefined' && firebase.firestore) {
+      callback();
+    } else if (attempts < 20) {
+      setTimeout(() => waitForFirebase(callback, attempts + 1), 250);
+    } else {
+      // Firebase CDN non chargé après 5s → afficher quand même avec fallback
+      console.warn('Firebase CDN non disponible — utilisation des défauts');
+      callback();
+    }
+  }
+
   window.addEventListener('DOMContentLoaded', () => {
-    // Firebase init différé (après chargement CDN)
-    setTimeout(() => {
-      crmShowLoading(true);
+    crmShowLoading(true);
+    waitForFirebase(() => {
       crmRenderAll();
-    }, 300);
+    });
   });
 
   // ── SETUP MOBILE NAV (scroll horizontal de pills) ──
